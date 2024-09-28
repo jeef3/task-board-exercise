@@ -42,9 +42,8 @@ export default function App() {
 
   return (
     <>
-      <p className="read-the-docs">
-        Hi<pre> {JSON.stringify(data, null, 2)}</pre>
-      </p>
+      <p className="read-the-docs">Hi</p>
+      <pre> {JSON.stringify(data, null, 2)}</pre>
     </>
   );
 }

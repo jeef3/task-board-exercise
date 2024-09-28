@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_APP_GRAPHQL_URI: string;
+  readonly VITE_APP_GRAPHQL_WS_URI: string;
   readonly VITE_APP_USER_ID: string;
 }
 
