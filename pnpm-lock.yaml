@@ -11,9 +11,6 @@ importers:
       '@apollo/client':
         specifier: ^3.11.8
         version: 3.11.8(@types/react@18.3.10)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      graphql:
-        specifier: ^16.9.0
-        version: 16.9.0
       graphql-ws:
         specifier: ^5.16.0
         version: 5.16.0(graphql@16.9.0)
@@ -30,12 +27,18 @@ importers:
       '@graphql-codegen/cli':
         specifier: ^5.0.2
         version: 5.0.2(@types/node@22.7.4)(graphql@16.9.0)(typescript@5.6.2)
+      '@graphql-codegen/client-preset':
+        specifier: ^4.3.3
+        version: 4.3.3(graphql@16.9.0)
       '@graphql-codegen/typescript':
         specifier: ^4.0.9
         version: 4.0.9(graphql@16.9.0)
       '@graphql-codegen/typescript-resolvers':
         specifier: ^4.2.1
         version: 4.2.1(graphql@16.9.0)
+      '@graphql-typed-document-node/core':
+        specifier: ^3.2.0
+        version: 3.2.0(graphql@16.9.0)
       '@types/node':
         specifier: ^22.7.4
         version: 22.7.4
@@ -63,8 +66,11 @@ importers:
       globals:
         specifier: ^15.9.0
         version: 15.9.0
+      graphql:
+        specifier: ^16.9.0
+        version: 16.9.0
       typescript:
-        specifier: ^5.5.3
+        specifier: ^5.6.2
         version: 5.6.2
       typescript-eslint:
         specifier: ^8.0.1

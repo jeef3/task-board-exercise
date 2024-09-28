@@ -11,11 +11,20 @@ const config: CodegenConfig = {
         },
     },
   ],
+  documents: ["src/**/*.{ts,tsx}"],
   generates: {
-    "./src/types.d.ts": {
-      plugins: ["typescript", "typescript-resolvers"],
+    "./src/__generated__/": {
+      preset: "client",
+      plugins: [],
+      presetConfig: {
+        gqlTagName: "gql",
+      },
     },
+    // "./src/types.d.ts": {
+    //   plugins: ["typescript", "typescript-resolvers"],
+    // },
   },
+  ignoreNoDocuments: true,
 };
 
 export default config;
