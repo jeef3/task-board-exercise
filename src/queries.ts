@@ -28,7 +28,52 @@ export const GET_ME = gql(`
           id
           name
           timezone
+          boards {
+            id
+            name
+          }
         }
+      }
+    }
+  }
+`);
+
+export const GET_ORGANISATION = gql(`
+  query organisation($organisationId: ID!) {
+    organisation(organisationId: $organisationId) {
+      id
+      name
+      timezone
+      createdAt
+      updatedAt
+
+      boards {
+        id
+        name
+
+        tickets {
+          id
+          name
+          description
+          status
+        }
+      }
+    }
+  }
+`);
+
+export const PUT_BOARD = gql(`
+  mutation putBoard($organisationId: ID!, $boardId: ID, $input: BoardInput!) {
+    putBoard(organisationId: $organisationId, boardId: $boardId, input: $input) {
+      id
+      name
+
+      createdAt
+      updatedAt
+      tickets {
+        name
+        description
+        status
       }
     }
   }
