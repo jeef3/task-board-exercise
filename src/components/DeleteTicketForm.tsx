@@ -3,7 +3,7 @@ import { type FormEvent, useCallback } from "react";
 import { type Ticket } from "../__generated__/graphql";
 import useForm from "../useForm";
 
-export default function TicketForm({
+export default function DeleteTicketForm({
   organisationId,
   boardId,
   ticket = null,
@@ -16,7 +16,7 @@ export default function TicketForm({
   onSubmit?: (organisationId: string, boardId: string, ticket: Ticket) => void;
   onClose?: () => void;
 }) {
-  const { data, handleChange } = useForm<Ticket>(
+  const { data } = useForm<Ticket>(
     ticket ?? ({ name: "", status: "TODO", visible: true } as Ticket),
   );
 
@@ -34,6 +34,8 @@ export default function TicketForm({
 
   return (
     <div>
+      <p>Are you sure you want to delete this ticket?</p>
+
       <button onClick={onClose}>Close</button>
       <button onClick={handleSubmit}>Yes, delete</button>
     </div>
