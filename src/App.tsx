@@ -230,7 +230,21 @@ export default function App() {
                   <ul>
                     {b.tickets.map((t) => (
                       <li key={t.id}>
-                        {t.name} {t.status}
+                        <span>
+                          {t.status === "DONE"
+                            ? "✅"
+                            : t.status === "INPROGRESS"
+                              ? "🔵"
+                              : "⚪"}
+                        </span>{" "}
+                        <span
+                          style={{
+                            textDecoration:
+                              t.status === "DONE" ? "line-through" : "none",
+                          }}
+                        >
+                          {t.name}
+                        </span>{" "}
                         <button
                           onClick={() =>
                             handleShowEditTicketClick(
