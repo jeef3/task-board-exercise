@@ -3,9 +3,10 @@ import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import BoardForm from "./components/BoardForm";
 import Overlay from "./components/Overlay";
-import { GET_ME, GET_ORGANISATION, PUT_BOARD } from "./queries";
-import { Board } from "./__generated__/graphql";
+import { GET_ME, GET_ORGANISATION, PUT_BOARD, PUT_TICKET } from "./queries";
+import { Board, Ticket } from "./__generated__/graphql";
 import ModalHeader from "./components/ModalHeader";
+import TicketForm from "./components/TicketForm";
 
 export default function App() {
   const { loading: loadingMe, error: errorMe, data: dataMe } = useQuery(GET_ME);
@@ -25,6 +26,7 @@ export default function App() {
   const { organisation } = dataOrg ?? {};
 
   const [addOrEditBoard] = useMutation(PUT_BOARD);
+  const [addOrEditTicket] = useMutation(PUT_TICKET);
 
   const [showAddBoard, setShowAddBoard] = useState(false);
   const [showEditBoard, setShowEditBoard] = useState<{
@@ -34,14 +36,33 @@ export default function App() {
     show: false,
     board: null,
   });
+  const [showAddTicket, setShowAddTicket] = useState<{
+    show: boolean;
+    boardId: string | null;
+  }>({ show: false, boardId: null });
+  const [showEditTicket, setShowEditTicket] = useState<{
+    show: boolean;
+    ticket: Ticket | null;
+  }>({
+    show: false,
+    ticket: null,
+  });
 
-  const handleShowAddBoardClick = useCallback(() => {
-    setShowAddBoard(true);
-  }, []);
+  const handleShowAddBoardClick = useCallback(() => setShowAddBoard(true), []);
 
-  const handleShowEditBoardClick = useCallback((board: Board) => {
-    setShowEditBoard({ show: true, board });
-  }, []);
+  const handleShowEditBoardClick = useCallback(
+    (board: Board) => setShowEditBoard({ show: true, board }),
+    [],
+  );
+
+  const handleShowAddTicketClick = useCallback(
+    (boardId: string) => setShowAddTicket({ show: true, boardId }),
+    [],
+  );
+  const handleShowEditTicketClick = useCallback(
+    (boardId: string) => setShowAddTicket({ show: true, boardId }),
+    [],
+  );
 
   const handleAddBoard = useCallback(
     (board: Board) => {
@@ -66,6 +87,31 @@ export default function App() {
       });
     },
     [addOrEditBoard, organisationId],
+  );
+
+  const handleAddTicket = useCallback(
+    (ticket: Ticket) => {
+      addOrEditTicket({
+        variables: {
+          organisationId: organisationId ?? "",
+          input: { name: ticket.name },
+        },
+      });
+    },
+    [addOrEditTicket, organisationId],
+  );
+
+  const handleEditTicket = useCallback(
+    (ticket: Ticket) => {
+      addOrEditTicket({
+        variables: {
+          organisationId: organisationId ?? "",
+          ticketId: ticket.id,
+          input: { name: ticket.name },
+        },
+      });
+    },
+    [addOrEditTicket, organisationId],
   );
 
   if (loadingMe || loadingOrg) return <p>Loading…</p>;
@@ -133,7 +179,12 @@ export default function App() {
 
               <div style={{ padding: 4 }}>
                 {!b.tickets.length ? (
-                  "This board as no tickets, yet!"
+                  <div>
+                    This board as no tickets, yet!{" "}
+                    <button onClick={() => handleShowAddTicketClick(b.id)}>
+                      Add ticket
+                    </button>
+                  </div>
                 ) : (
                   <ul>
                     {b.tickets.map((t) => (
@@ -201,6 +252,53 @@ export default function App() {
                 board={showEditBoard.board}
                 onSubmit={handleEditBoard}
                 onClose={() => setShowEditBoard({ show: false, board: null })}
+              />
+            </dialog>
+          </>,
+          document.getElementById("modal")!,
+        )}
+
+      {showAddTicket.show &&
+        showAddTicket.boardId &&
+        createPortal(
+          <>
+            <Overlay />
+            <dialog
+              open
+              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
+            >
+              <ModalHeader
+                title="Add Ticket"
+                onClose={() => setShowAddTicket({ show: false, boardId: null })}
+              />
+
+              <TicketForm
+                onSubmit={handleAddTicket}
+                onClose={() => setShowAddTicket({ show: false, boardId: null })}
+              />
+            </dialog>
+          </>,
+          document.getElementById("modal")!,
+        )}
+
+      {showEditTicket.show &&
+        showEditTicket.ticket &&
+        createPortal(
+          <>
+            <Overlay />
+            <dialog
+              open
+              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
+            >
+              <ModalHeader
+                title="Edit Ticket"
+                onClose={() => setShowEditTicket({ show: false, ticket: null })}
+              />
+
+              <TicketForm
+                ticket={showEditTicket.ticket}
+                onSubmit={handleEditTicket}
+                onClose={() => setShowEditTicket({ show: false, ticket: null })}
               />
             </dialog>
           </>,

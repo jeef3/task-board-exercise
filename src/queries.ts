@@ -78,3 +78,15 @@ export const PUT_BOARD = gql(`
     }
   }
 `);
+
+export const PUT_TICKET = gql(`
+  mutation putTicket($organisationId: ID!, $boardId: ID!, $ticketId: ID $input: TicketInput!) {
+    putTicket(organisationId: $organisationId, boardId: $boardId, ticketId: $ticketId, input: $input) {
+      id
+      name
+      description
+      status
+      visible
+    }
+  }
+`);
