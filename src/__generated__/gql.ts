@@ -17,6 +17,7 @@ const documents = {
     "\n  query organisation($organisationId: ID!) {\n    organisation(organisationId: $organisationId) {\n      id\n      name\n      timezone\n      createdAt\n      updatedAt\n\n      boards {\n        id\n        name\n\n        tickets {\n          id\n          name\n          description\n          status\n        }\n      }\n    }\n  }\n": types.OrganisationDocument,
     "\n  mutation putBoard($organisationId: ID!, $boardId: ID, $input: BoardInput!) {\n    putBoard(organisationId: $organisationId, boardId: $boardId, input: $input) {\n      id\n      name\n\n      createdAt\n      updatedAt\n      tickets {\n        name\n        description\n        status\n      }\n    }\n  }\n": types.PutBoardDocument,
     "\n  mutation putTicket($organisationId: ID!, $boardId: ID!, $ticketId: ID $input: TicketInput!) {\n    putTicket(organisationId: $organisationId, boardId: $boardId, ticketId: $ticketId, input: $input) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n": types.PutTicketDocument,
+    "\n  mutation deleteTicket($organisationId: ID!, $ticketId: ID!) {\n    deleteTicket(organisationId: $organisationId, ticketId: $ticketId) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n": types.DeleteTicketDocument,
 };
 
 /**
@@ -49,6 +50,10 @@ export function gql(source: "\n  mutation putBoard($organisationId: ID!, $boardI
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation putTicket($organisationId: ID!, $boardId: ID!, $ticketId: ID $input: TicketInput!) {\n    putTicket(organisationId: $organisationId, boardId: $boardId, ticketId: $ticketId, input: $input) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n"): (typeof documents)["\n  mutation putTicket($organisationId: ID!, $boardId: ID!, $ticketId: ID $input: TicketInput!) {\n    putTicket(organisationId: $organisationId, boardId: $boardId, ticketId: $ticketId, input: $input) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation deleteTicket($organisationId: ID!, $ticketId: ID!) {\n    deleteTicket(organisationId: $organisationId, ticketId: $ticketId) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n"): (typeof documents)["\n  mutation deleteTicket($organisationId: ID!, $ticketId: ID!) {\n    deleteTicket(organisationId: $organisationId, ticketId: $ticketId) {\n      id\n      name\n      description\n      status\n      visible\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
