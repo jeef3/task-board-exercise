@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useSubscription, gql } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
@@ -9,6 +9,7 @@ import {
   GET_ORGANISATION,
   PUT_BOARD,
   PUT_TICKET,
+  SUBSCRIPTION_TICKETS,
 } from "./queries";
 import BoardForm from "./components/BoardForm";
 import Overlay from "./components/Overlay";
@@ -46,6 +47,14 @@ export default function App() {
   });
 
   const { organisation } = dataOrg ?? {};
+
+  // const { data: dataSub, loading: loadingSub } = useSubscription(
+  //   SUBSCRIPTION_TICKETS,
+  //   {
+  //     skip: !organisationId,
+  //     variables: { organisationId: organisationId ?? "" },
+  //   },
+  // );
 
   const [addOrEditBoard] = useMutation(PUT_BOARD);
   // const [deleteBoard] = useMutation(DELETE_BOARD);

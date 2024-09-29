@@ -113,3 +113,12 @@ export const DELETE_TICKET = gql(`
     }
   }
 `);
+
+export const SUBSCRIPTION_TICKETS = gql(`
+  subscription ticketUpdates($organisationId: ID!) {
+    ticketUpdates(organisationId: $organisationId) {
+      name
+      id
+    }
+  }
+`);
