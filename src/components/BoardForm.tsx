@@ -27,7 +27,10 @@ export default function BoardForm({
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: "flex", gap: 8, flexDirection: "column" }}
+    >
       <label>
         Name{" "}
         <input

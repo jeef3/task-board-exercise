@@ -5,6 +5,7 @@ import BoardForm from "./components/BoardForm";
 import Overlay from "./components/Overlay";
 import { GET_ME, GET_ORGANISATION, PUT_BOARD } from "./queries";
 import { Board } from "./__generated__/graphql";
+import ModalHeader from "./components/ModalHeader";
 
 export default function App() {
   const { loading: loadingMe, error: errorMe, data: dataMe } = useQuery(GET_ME);
@@ -161,8 +162,11 @@ export default function App() {
               open
               style={{ position: "fixed", top: 50, maxWidth: "90%" }}
             >
-              <button onClick={() => setShowAddBoard(false)}>Close</button>
-              <h2>Add Board</h2>
+              <ModalHeader
+                title="Add Board"
+                onClose={() => setShowAddBoard(false)}
+              />
+
               <BoardForm
                 onSubmit={handleAddBoard}
                 onClose={() => setShowAddBoard(false)}
@@ -181,12 +185,11 @@ export default function App() {
               open
               style={{ position: "fixed", top: 50, maxWidth: "90%" }}
             >
-              <button
-                onClick={() => setShowEditBoard({ show: false, board: null })}
-              >
-                Close
-              </button>
-              <h2>Edit Board</h2>
+              <ModalHeader
+                title="Edit Board"
+                onClose={() => setShowEditBoard({ show: false, board: null })}
+              />
+
               <BoardForm
                 board={showEditBoard.board}
                 onSubmit={handleEditBoard}
