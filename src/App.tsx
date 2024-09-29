@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useSubscription, gql } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
@@ -9,7 +9,6 @@ import {
   GET_ORGANISATION,
   PUT_BOARD,
   PUT_TICKET,
-  SUBSCRIPTION_TICKETS,
 } from "./queries";
 import BoardForm from "./components/BoardForm";
 import Overlay from "./components/Overlay";
@@ -41,6 +40,7 @@ export default function App() {
     loading: loadingOrg,
     error: errorOrg,
     data: dataOrg,
+    refetch,
   } = useQuery(GET_ORGANISATION, {
     skip: !organisationId,
     variables: { organisationId: organisationId ?? "" },
@@ -142,14 +142,17 @@ export default function App() {
   );
 
   const handleAddBoard = useCallback(
-    (organisationId: string, board: Board) =>
-      addOrEditBoard({
+    async (organisationId: string, board: Board) => {
+      await addOrEditBoard({
         variables: {
           organisationId,
           input: { name: board.name },
         },
-      }),
-    [addOrEditBoard],
+      });
+
+      await refetch();
+    },
+    [addOrEditBoard, refetch],
   );
 
   const handleEditBoard = useCallback(
@@ -169,8 +172,8 @@ export default function App() {
   }, []);
 
   const handleAddTicket = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) =>
-      addOrEditTicket({
+    async (organisationId: string, boardId: string, ticket: Ticket) => {
+      await addOrEditTicket({
         variables: {
           organisationId,
           boardId,
@@ -181,8 +184,11 @@ export default function App() {
             visible: ticket.visible,
           },
         },
-      }),
-    [addOrEditTicket],
+      });
+
+      await refetch();
+    },
+    [addOrEditTicket, refetch],
   );
 
   const handleEditTicket = useCallback(
@@ -204,9 +210,13 @@ export default function App() {
   );
 
   const handleDeleteTicket = useCallback(
-    (organisationId: string, _boardId: string, ticket: Ticket) =>
-      deleteTicket({ variables: { organisationId, ticketId: ticket.id } }),
-    [deleteTicket],
+    async (organisationId: string, _boardId: string, ticket: Ticket) => {
+      await deleteTicket({
+        variables: { organisationId, ticketId: ticket.id },
+      });
+      refetch();
+    },
+    [deleteTicket, refetch],
   );
 
   if (loadingMe || loadingOrg) return <p>Loading…</p>;
