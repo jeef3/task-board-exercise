@@ -133,32 +133,34 @@ export default function App() {
   );
 
   const handleAddBoard = useCallback(
-    (organisationId: string, board: Board) => {
+    (organisationId: string, board: Board) =>
       addOrEditBoard({
         variables: {
           organisationId,
           input: { name: board.name },
         },
-      });
-    },
+      }),
     [addOrEditBoard],
   );
 
   const handleEditBoard = useCallback(
-    (organisationId: string, board: Board) => {
+    (organisationId: string, board: Board) =>
       addOrEditBoard({
         variables: {
           organisationId,
           boardId: board.id,
           input: { name: board.name },
         },
-      });
-    },
+      }),
     [addOrEditBoard],
   );
 
+  const handleDeleteBoard = useCallback(() => {
+    // deleteBoard({ variables: { organisationId, ticketId: ticket.id } });
+  }, []);
+
   const handleAddTicket = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) => {
+    (organisationId: string, boardId: string, ticket: Ticket) =>
       addOrEditTicket({
         variables: {
           organisationId,
@@ -170,13 +172,12 @@ export default function App() {
             visible: ticket.visible,
           },
         },
-      });
-    },
+      }),
     [addOrEditTicket],
   );
 
   const handleEditTicket = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) => {
+    (organisationId: string, boardId: string, ticket: Ticket) =>
       addOrEditTicket({
         variables: {
           organisationId,
@@ -189,15 +190,13 @@ export default function App() {
             visible: ticket.visible,
           },
         },
-      });
-    },
+      }),
     [addOrEditTicket],
   );
 
   const handleDeleteTicket = useCallback(
-    (organisationId: string, _boardId: string, ticket: Ticket) => {
-      deleteTicket({ variables: { organisationId, ticketId: ticket.id } });
-    },
+    (organisationId: string, _boardId: string, ticket: Ticket) =>
+      deleteTicket({ variables: { organisationId, ticketId: ticket.id } }),
     [deleteTicket],
   );
 
