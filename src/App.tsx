@@ -111,7 +111,7 @@ export default function App() {
               key={b.id}
               style={{
                 border: "solid 1px hsl(0 0% 50%)",
-                borderRadius: 4,
+                borderRadius: 8,
 
                 display: "flex",
                 gap: 4,
@@ -146,12 +146,19 @@ export default function App() {
           ))}
         </div>
 
-        <div
-          style={{ padding: 8, borderRadius: 8, background: "hsl(0 0% 95%)" }}
+        <details
+          style={{
+            marginTop: 8,
+            borderRadius: 8,
+            background: "hsl(0 0% 95%)",
+          }}
         >
-          <pre>{JSON.stringify(dataMe, null, 2)}</pre>
-          <pre>{JSON.stringify(dataOrg, null, 2)}</pre>
-        </div>
+          <summary style={{ padding: 8 }}>Raw Data</summary>
+          <div style={{ overflow: "scroll", padding: 8, maxHeight: 300 }}>
+            <pre>{JSON.stringify(dataMe, null, 2)}</pre>
+            <pre>{JSON.stringify(dataOrg, null, 2)}</pre>
+          </div>
+        </details>
       </div>
 
       {showAddBoard &&
