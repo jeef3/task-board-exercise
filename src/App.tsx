@@ -97,7 +97,7 @@ export default function App() {
       addOrEditBoard({
         variables: {
           organisationId,
-          input: board,
+          input: { name: board.name },
         },
       });
     },
@@ -110,7 +110,7 @@ export default function App() {
         variables: {
           organisationId,
           boardId: board.id,
-          input: board,
+          input: { name: board.name },
         },
       });
     },
@@ -123,7 +123,12 @@ export default function App() {
         variables: {
           organisationId,
           boardId,
-          input: ticket,
+          input: {
+            name: ticket.name,
+            description: ticket.description,
+            status: ticket.status,
+            visible: ticket.visible,
+          },
         },
       });
     },
@@ -137,7 +142,12 @@ export default function App() {
           organisationId,
           boardId,
           ticketId: ticket.id,
-          input: ticket,
+          input: {
+            name: ticket.name,
+            description: ticket.description,
+            status: ticket.status,
+            visible: ticket.visible,
+          },
         },
       });
     },
@@ -215,23 +225,35 @@ export default function App() {
 
               <div style={{ padding: 4 }}>
                 {!b.tickets.length ? (
-                  <div>
-                    This board as no tickets, yet!{" "}
-                    <button
-                      onClick={() =>
-                        handleShowAddTicketClick(organisation.id, b.id)
-                      }
-                    >
-                      Add ticket
-                    </button>
-                  </div>
+                  <div>This board as no tickets, yet! </div>
                 ) : (
                   <ul>
                     {b.tickets.map((t) => (
-                      <li key={t.id}>{t.name}</li>
+                      <li key={t.id}>
+                        {t.name} {t.status}
+                        <button
+                          onClick={() =>
+                            handleShowEditTicketClick(
+                              organisation.id,
+                              b.id,
+                              t as Ticket,
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+                      </li>
                     ))}
                   </ul>
                 )}
+
+                <button
+                  onClick={() =>
+                    handleShowAddTicketClick(organisation.id, b.id)
+                  }
+                >
+                  Add ticket
+                </button>
               </div>
             </article>
           ))}
