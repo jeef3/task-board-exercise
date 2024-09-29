@@ -29,7 +29,14 @@ export default function BoardForm({
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        Name <input required type="text" name="name" onChange={handleChange} />
+        Name{" "}
+        <input
+          required
+          type="text"
+          name="name"
+          defaultValue={board?.name}
+          onChange={handleChange}
+        />
       </label>
 
       <button>Save</button>

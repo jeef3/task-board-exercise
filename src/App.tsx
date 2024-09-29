@@ -23,24 +23,48 @@ export default function App() {
 
   const { organisation } = dataOrg ?? {};
 
-  const [addBoard] = useMutation(PUT_BOARD);
+  const [addOrEditBoard] = useMutation(PUT_BOARD);
 
   const [showAddBoard, setShowAddBoard] = useState(false);
+  const [showEditBoard, setShowEditBoard] = useState<{
+    show: boolean;
+    board: Board | null;
+  }>({
+    show: false,
+    board: null,
+  });
 
   const handleShowAddBoardClick = useCallback(() => {
     setShowAddBoard(true);
   }, []);
 
+  const handleShowEditBoardClick = useCallback((board: Board) => {
+    setShowEditBoard({ show: true, board });
+  }, []);
+
   const handleAddBoard = useCallback(
     (board: Board) => {
-      addBoard({
+      addOrEditBoard({
         variables: {
           organisationId: organisationId ?? "",
           input: { name: board.name },
         },
       });
     },
-    [addBoard, organisationId],
+    [addOrEditBoard, organisationId],
+  );
+
+  const handleEditBoard = useCallback(
+    (board: Board) => {
+      addOrEditBoard({
+        variables: {
+          organisationId: organisationId ?? "",
+          boardId: board.id,
+          input: { name: board.name },
+        },
+      });
+    },
+    [addOrEditBoard, organisationId],
   );
 
   if (loadingMe || loadingOrg) return <p>Loading…</p>;
@@ -80,18 +104,42 @@ export default function App() {
         <h2>Boards</h2>
         <button onClick={handleShowAddBoardClick}>Add board</button>
 
-        <div>
+        <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
           {organisation.boards.map((b) => (
-            <article key={b.id}>
+            <article
+              key={b.id}
+              style={{
+                border: "solid 1px hsl(0 0% 50%)",
+                borderRadius: 4,
+
+                display: "flex",
+                gap: 4,
+                flexDirection: "column",
+              }}
+            >
               <header
-                style={{ display: "flex", justifyContent: "space-between" }}
+                style={{
+                  padding: 4,
+                  borderBottom: "solid 1px hsl(0 0% 95%)",
+                  display: "flex",
+                }}
               >
                 <h3>{b.name}</h3>
-                <button>Edit</button>
+                <button onClick={() => handleShowEditBoardClick(b as Board)}>
+                  Edit
+                </button>
               </header>
 
-              <div>
-                <ul></ul>
+              <div style={{ padding: 4 }}>
+                {!b.tickets.length ? (
+                  "This board as no tickets, yet!"
+                ) : (
+                  <ul>
+                    {b.tickets.map((t) => (
+                      <li key={t.id}>{t.name}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </article>
           ))}
@@ -118,6 +166,31 @@ export default function App() {
               <BoardForm
                 onSubmit={handleAddBoard}
                 onClose={() => setShowAddBoard(false)}
+              />
+            </dialog>
+          </>,
+          document.getElementById("modal")!,
+        )}
+
+      {showEditBoard.show &&
+        showEditBoard.board &&
+        createPortal(
+          <>
+            <Overlay />
+            <dialog
+              open
+              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
+            >
+              <button
+                onClick={() => setShowEditBoard({ show: false, board: null })}
+              >
+                Close
+              </button>
+              <h2>Edit Board</h2>
+              <BoardForm
+                board={showEditBoard.board}
+                onSubmit={handleEditBoard}
+                onClose={() => setShowEditBoard({ show: false, board: null })}
               />
             </dialog>
           </>,
