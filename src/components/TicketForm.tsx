@@ -4,15 +4,21 @@ import { type Ticket } from "../__generated__/graphql";
 import useForm from "../useForm";
 
 export default function TicketForm({
+  organisationId,
+  boardId,
   ticket = null,
   onSubmit,
   onClose,
 }: {
+  organisationId: string;
+  boardId: string;
   ticket?: Ticket | null;
-  onSubmit?: (ticket: Ticket) => void;
+  onSubmit?: (organisationId: string, boardId: string, ticket: Ticket) => void;
   onClose?: () => void;
 }) {
-  const { data, handleChange } = useForm<Ticket>(ticket);
+  const { data, handleChange } = useForm<Ticket>(
+    ticket ?? ({ name: "", status: "TODO", visible: false } as Ticket),
+  );
 
   const handleSubmit = useCallback(
     (e: FormEvent) => {
@@ -20,10 +26,10 @@ export default function TicketForm({
 
       // TODO: Validation checks on data
 
-      onSubmit?.(data);
+      onSubmit?.(organisationId, boardId, data);
       onClose?.();
     },
-    [data, onClose, onSubmit],
+    [boardId, data, onClose, onSubmit, organisationId],
   );
 
   return (
@@ -45,7 +51,6 @@ export default function TicketForm({
       <label>
         Description{" "}
         <input
-          required
           type="text"
           name="description"
           defaultValue={ticket?.description}

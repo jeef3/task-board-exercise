@@ -4,12 +4,14 @@ import { type Board } from "../__generated__/graphql";
 import useForm from "../useForm";
 
 export default function BoardForm({
+  organisationId,
   board = null,
   onSubmit,
   onClose,
 }: {
+  organisationId: string;
   board?: Board | null;
-  onSubmit?: (board: Board) => void;
+  onSubmit?: (organisationId: string, board: Board) => void;
   onClose?: () => void;
 }) {
   const { data, handleChange } = useForm<Board>(board);
@@ -20,10 +22,10 @@ export default function BoardForm({
 
       // TODO: Validation checks on data
 
-      onSubmit?.(data);
+      onSubmit?.(organisationId, data);
       onClose?.();
     },
-    [data, onClose, onSubmit],
+    [data, onClose, onSubmit, organisationId],
   );
 
   return (

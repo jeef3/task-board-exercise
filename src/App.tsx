@@ -8,6 +8,19 @@ import { Board, Ticket } from "./__generated__/graphql";
 import ModalHeader from "./components/ModalHeader";
 import TicketForm from "./components/TicketForm";
 
+interface BoardModalState {
+  show: boolean;
+
+  organisationId?: string | null;
+}
+
+interface TicketModalState {
+  show: boolean;
+
+  organisationId?: string | null;
+  boardId?: string | null;
+}
+
 export default function App() {
   const { loading: loadingMe, error: errorMe, data: dataMe } = useQuery(GET_ME);
 
@@ -28,90 +41,107 @@ export default function App() {
   const [addOrEditBoard] = useMutation(PUT_BOARD);
   const [addOrEditTicket] = useMutation(PUT_TICKET);
 
-  const [showAddBoard, setShowAddBoard] = useState(false);
-  const [showEditBoard, setShowEditBoard] = useState<{
-    show: boolean;
-    board: Board | null;
-  }>({
+  const [showAddBoard, setShowAddBoard] = useState<BoardModalState>({
     show: false,
+    organisationId: null,
+  });
+
+  const [showEditBoard, setShowEditBoard] = useState<
+    BoardModalState & { board?: Board | null }
+  >({
+    show: false,
+    organisationId: null,
     board: null,
   });
-  const [showAddTicket, setShowAddTicket] = useState<{
-    show: boolean;
-    boardId: string | null;
-  }>({ show: false, boardId: null });
-  const [showEditTicket, setShowEditTicket] = useState<{
-    show: boolean;
-    ticket: Ticket | null;
-  }>({
+
+  const [showAddTicket, setShowAddTicket] = useState<TicketModalState>({
     show: false,
+    organisationId: null,
+    boardId: null,
+  });
+
+  const [showEditTicket, setShowEditTicket] = useState<
+    TicketModalState & { ticket?: Ticket | null }
+  >({
+    show: false,
+    organisationId: null,
+    boardId: null,
     ticket: null,
   });
 
-  const handleShowAddBoardClick = useCallback(() => setShowAddBoard(true), []);
+  const handleShowAddBoardClick = useCallback(
+    (organisationId: string) => setShowAddBoard({ show: true, organisationId }),
+    [],
+  );
 
   const handleShowEditBoardClick = useCallback(
-    (board: Board) => setShowEditBoard({ show: true, board }),
+    (organisationId: string, board: Board) =>
+      setShowEditBoard({ show: true, organisationId, board }),
     [],
   );
 
   const handleShowAddTicketClick = useCallback(
-    (boardId: string) => setShowAddTicket({ show: true, boardId }),
+    (organisationId: string, boardId: string) =>
+      setShowAddTicket({ show: true, organisationId, boardId }),
     [],
   );
+
   const handleShowEditTicketClick = useCallback(
-    (boardId: string) => setShowAddTicket({ show: true, boardId }),
+    (organisationId: string, boardId: string, ticket: Ticket) =>
+      setShowEditTicket({ show: true, organisationId, boardId, ticket }),
     [],
   );
 
   const handleAddBoard = useCallback(
-    (board: Board) => {
+    (organisationId: string, board: Board) => {
       addOrEditBoard({
         variables: {
-          organisationId: organisationId ?? "",
-          input: { name: board.name },
+          organisationId,
+          input: board,
         },
       });
     },
-    [addOrEditBoard, organisationId],
+    [addOrEditBoard],
   );
 
   const handleEditBoard = useCallback(
-    (board: Board) => {
+    (organisationId: string, board: Board) => {
       addOrEditBoard({
         variables: {
-          organisationId: organisationId ?? "",
+          organisationId,
           boardId: board.id,
-          input: { name: board.name },
+          input: board,
         },
       });
     },
-    [addOrEditBoard, organisationId],
+    [addOrEditBoard],
   );
 
   const handleAddTicket = useCallback(
-    (ticket: Ticket) => {
+    (organisationId: string, boardId: string, ticket: Ticket) => {
       addOrEditTicket({
         variables: {
-          organisationId: organisationId ?? "",
-          input: { name: ticket.name },
+          organisationId,
+          boardId,
+          input: ticket,
         },
       });
     },
-    [addOrEditTicket, organisationId],
+    [addOrEditTicket],
   );
 
   const handleEditTicket = useCallback(
-    (ticket: Ticket) => {
+    (organisationId: string, boardId: string, ticket: Ticket) => {
       addOrEditTicket({
         variables: {
-          organisationId: organisationId ?? "",
+          organisationId,
+          boardId,
           ticketId: ticket.id,
-          input: { name: ticket.name },
+          input: ticket,
         },
       });
     },
-    [addOrEditTicket, organisationId],
+    [addOrEditTicket],
   );
 
   if (loadingMe || loadingOrg) return <p>Loading…</p>;
@@ -149,7 +179,9 @@ export default function App() {
 
       <div style={{ padding: 8 }}>
         <h2>Boards</h2>
-        <button onClick={handleShowAddBoardClick}>Add board</button>
+        <button onClick={() => handleShowAddBoardClick(organisation.id)}>
+          Add board
+        </button>
 
         <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
           {organisation.boards.map((b) => (
@@ -172,7 +204,11 @@ export default function App() {
                 }}
               >
                 <h3>{b.name}</h3>
-                <button onClick={() => handleShowEditBoardClick(b as Board)}>
+                <button
+                  onClick={() =>
+                    handleShowEditBoardClick(organisation.id, b as Board)
+                  }
+                >
                   Edit
                 </button>
               </header>
@@ -181,7 +217,11 @@ export default function App() {
                 {!b.tickets.length ? (
                   <div>
                     This board as no tickets, yet!{" "}
-                    <button onClick={() => handleShowAddTicketClick(b.id)}>
+                    <button
+                      onClick={() =>
+                        handleShowAddTicketClick(organisation.id, b.id)
+                      }
+                    >
                       Add ticket
                     </button>
                   </div>
@@ -212,7 +252,8 @@ export default function App() {
         </details>
       </div>
 
-      {showAddBoard &&
+      {showAddBoard.show &&
+        showAddBoard.organisationId &&
         createPortal(
           <>
             <Overlay />
@@ -222,12 +263,13 @@ export default function App() {
             >
               <ModalHeader
                 title="Add Board"
-                onClose={() => setShowAddBoard(false)}
+                onClose={() => setShowAddBoard({ show: false })}
               />
 
               <BoardForm
+                organisationId={organisation.id}
                 onSubmit={handleAddBoard}
-                onClose={() => setShowAddBoard(false)}
+                onClose={() => setShowAddBoard({ show: false })}
               />
             </dialog>
           </>,
@@ -235,6 +277,7 @@ export default function App() {
         )}
 
       {showEditBoard.show &&
+        showEditBoard.organisationId &&
         showEditBoard.board &&
         createPortal(
           <>
@@ -249,6 +292,7 @@ export default function App() {
               />
 
               <BoardForm
+                organisationId={organisation.id}
                 board={showEditBoard.board}
                 onSubmit={handleEditBoard}
                 onClose={() => setShowEditBoard({ show: false, board: null })}
@@ -259,6 +303,7 @@ export default function App() {
         )}
 
       {showAddTicket.show &&
+        showAddTicket.organisationId &&
         showAddTicket.boardId &&
         createPortal(
           <>
@@ -269,12 +314,16 @@ export default function App() {
             >
               <ModalHeader
                 title="Add Ticket"
-                onClose={() => setShowAddTicket({ show: false, boardId: null })}
+                onClose={() => setShowAddTicket({ show: false })}
               />
 
               <TicketForm
-                onSubmit={handleAddTicket}
-                onClose={() => setShowAddTicket({ show: false, boardId: null })}
+                organisationId={organisation.id}
+                boardId={showAddTicket.boardId}
+                onSubmit={(oId, bId, ticket) =>
+                  handleAddTicket(oId, bId, ticket)
+                }
+                onClose={() => setShowAddTicket({ show: false })}
               />
             </dialog>
           </>,
@@ -282,6 +331,8 @@ export default function App() {
         )}
 
       {showEditTicket.show &&
+        showEditTicket.organisationId &&
+        showEditTicket.boardId &&
         showEditTicket.ticket &&
         createPortal(
           <>
@@ -292,13 +343,15 @@ export default function App() {
             >
               <ModalHeader
                 title="Edit Ticket"
-                onClose={() => setShowEditTicket({ show: false, ticket: null })}
+                onClose={() => setShowEditTicket({ show: false })}
               />
 
               <TicketForm
+                organisationId={organisation.id}
+                boardId={showEditTicket.boardId}
                 ticket={showEditTicket.ticket}
                 onSubmit={handleEditTicket}
-                onClose={() => setShowEditTicket({ show: false, ticket: null })}
+                onClose={() => setShowEditTicket({ show: false })}
               />
             </dialog>
           </>,
