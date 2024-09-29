@@ -6,7 +6,7 @@ export default function useForm<T>(initialData?: T | null) {
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const incomingValue =
-        e.target.type === "checkbox" ? e.target.checked : e.target.value.trim();
+        e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
       return setFormData((current) => ({
         ...current,
