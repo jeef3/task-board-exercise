@@ -312,6 +312,7 @@ export default function App() {
                         </span>{" "}
                         <span
                           style={{
+                            color: t.visible ? "hsl(0 0% 0%)" : "hsl(0 0% 70%)",
                             textDecoration:
                               t.status === "DONE" ? "line-through" : "none",
                           }}

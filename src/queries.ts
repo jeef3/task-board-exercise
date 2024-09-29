@@ -56,6 +56,7 @@ export const GET_ORGANISATION = gql(`
           name
           description
           status
+          visible
         }
       }
     }
@@ -74,6 +75,7 @@ export const PUT_BOARD = gql(`
         name
         description
         status
+        visible
       }
     }
   }
