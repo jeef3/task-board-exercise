@@ -39,7 +39,7 @@ export default function BoardForm({
           required
           type="text"
           name="name"
-          defaultValue={board?.name}
+          value={data.name}
           onChange={handleChange}
         />
       </label>

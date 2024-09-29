@@ -17,7 +17,7 @@ export default function TicketForm({
   onClose?: () => void;
 }) {
   const { data, handleChange } = useForm<Ticket>(
-    ticket ?? ({ name: "", status: "TODO", visible: false } as Ticket),
+    ticket ?? ({ name: "", status: "TODO", visible: true } as Ticket),
   );
 
   const handleSubmit = useCallback(
@@ -43,7 +43,7 @@ export default function TicketForm({
           required
           type="text"
           name="name"
-          defaultValue={ticket?.name}
+          value={data.name}
           onChange={handleChange}
         />
       </label>
@@ -53,7 +53,7 @@ export default function TicketForm({
         <input
           type="text"
           name="description"
-          defaultValue={ticket?.description}
+          value={data.description}
           onChange={handleChange}
         />
       </label>
@@ -63,7 +63,7 @@ export default function TicketForm({
         <select
           required
           name="status"
-          defaultValue={ticket?.status}
+          value={data.status}
           onChange={handleChange}
         >
           <option value="TODO">To Do</option>
@@ -77,7 +77,7 @@ export default function TicketForm({
         <input
           type="checkbox"
           name="visible"
-          defaultChecked={!!ticket?.visible}
+          checked={!!data.visible}
           onChange={handleChange}
         />
       </label>
