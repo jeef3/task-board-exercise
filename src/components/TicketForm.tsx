@@ -65,7 +65,7 @@ export default function TicketForm({
           });
 
           onClose?.();
-        } catch (e) {
+        } catch {
           setError("__root__", "Something went wrong, please try again");
         }
       })(e),
