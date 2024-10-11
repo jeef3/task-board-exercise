@@ -41,7 +41,6 @@ export default function TicketForm({
       void handleSubmit(async (ticket: TicketViewModel) => {
         // try {
         //   await new Promise<void>((_resolve, reject) => {
-        //     console.log("saving", ticket);
         //     setTimeout(() => {
         //       // resolve();
         //       reject();
@@ -67,14 +66,11 @@ export default function TicketForm({
 
           onClose?.();
         } catch (e) {
-          console.log(e);
           setError("__root__", "Something went wrong, please try again");
         }
       })(e),
     [addOrEditTicket, boardId, handleSubmit, onClose, organisationId, setError],
   );
-
-  console.log("form state", formState);
 
   return (
     <form
