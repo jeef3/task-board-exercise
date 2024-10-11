@@ -1,8 +1,10 @@
-import { type FormEvent, useCallback } from "react";
-
-import { type Board } from "../__generated__/graphql";
-import useForm from "../hooks/useForm";
+import { FormEvent, useCallback } from "react";
 import { useMutation } from "@apollo/client";
+
+import { Board } from "../__generated__/graphql";
+import Modal from "../components/Modal";
+import ModalHeader from "../components/ModalHeader";
+import useForm from "../hooks/useForm";
 import { PUT_BOARD } from "../queries";
 
 interface BoardViewModel {
@@ -14,14 +16,14 @@ const defaultNewBoard: BoardViewModel = {
   name: "",
 };
 
-export default function BoardForm({
+export default function AddEditBoardModal({
   organisationId,
   board = null,
   onClose,
 }: {
   organisationId: string;
   board?: Board | null;
-  onClose?: () => void;
+  onClose: () => void;
 }) {
   const [addOrEditBoard] = useMutation(PUT_BOARD);
 
@@ -31,15 +33,15 @@ export default function BoardForm({
   const onSubmit = useCallback(
     (e: FormEvent) =>
       void handleSubmit(async (board: BoardViewModel) => {
-        const { id, ...input } = board;
-
         try {
           await addOrEditBoard({
             variables: {
               organisationId,
 
-              boardId: id,
-              input,
+              boardId: board.id,
+              input: {
+                name: board.name,
+              },
             },
           });
 
@@ -52,24 +54,28 @@ export default function BoardForm({
   );
 
   return (
-    <form
-      onSubmit={onSubmit}
-      style={{ display: "flex", gap: 8, flexDirection: "column" }}
-    >
-      <label>
-        Name
-        <input
-          required
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-      </label>
+    <Modal>
+      <ModalHeader title="Add Board" onClose={onClose} />
 
-      <button disabled={formState.isSubmitting}>
-        {formState.isSubmitting ? "Saving…" : "Save"}
-      </button>
-    </form>
+      <form
+        onSubmit={onSubmit}
+        style={{ display: "flex", gap: 8, flexDirection: "column" }}
+      >
+        <label>
+          Name
+          <input
+            required
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </label>
+
+        <button disabled={formState.isSubmitting}>
+          {formState.isSubmitting ? "Saving…" : "Save"}
+        </button>
+      </form>
+    </Modal>
   );
 }

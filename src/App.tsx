@@ -1,15 +1,16 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { useModal } from "react-modal-hook";
 
 import { Board, Ticket } from "./__generated__/graphql";
-import { DELETE_TICKET, GET_ME, GET_ORGANISATION, PUT_BOARD } from "./queries";
-import BoardForm from "./components/BoardForm";
+import { DELETE_TICKET, GET_ME, GET_ORGANISATION } from "./queries";
 import Overlay from "./components/Overlay";
 import ModalHeader from "./components/ModalHeader";
-import TicketForm from "./components/TicketForm";
 import DeleteTicketForm from "./components/DeleteTicketForm";
 import DeleteBoardForm from "./components/DeleteBoardForm";
+import BoardModal from "./modals/AddEditBoardModal";
+import TicketModal from "./modals/AddEditTicketModal";
 
 interface BoardModalState {
   show: boolean;
@@ -50,22 +51,11 @@ export default function App() {
   //   },
   // );
 
-  const [addOrEditBoard] = useMutation(PUT_BOARD);
   // const [deleteBoard] = useMutation(DELETE_BOARD);
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
-  const [showAddBoard, setShowAddBoard] = useState<BoardModalState>({
-    show: false,
-    organisationId: null,
-  });
-
-  const [showEditBoard, setShowEditBoard] = useState<
-    BoardModalState & { board?: Board | null }
-  >({
-    show: false,
-    organisationId: null,
-    board: null,
-  });
+  const [activeBoard, setActiveBoard] = useState<Board | null>(null);
+  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
 
   const [showDeleteBoard, setShowDeleteBoard] = useState<
     BoardModalState & { board?: Board | null }
@@ -73,21 +63,6 @@ export default function App() {
     show: false,
     organisationId: null,
     board: null,
-  });
-
-  const [showAddTicket, setShowAddTicket] = useState<TicketModalState>({
-    show: false,
-    organisationId: null,
-    boardId: null,
-  });
-
-  const [showEditTicket, setShowEditTicket] = useState<
-    TicketModalState & { ticket?: Ticket | null }
-  >({
-    show: false,
-    organisationId: null,
-    boardId: null,
-    ticket: null,
   });
 
   const [showDeleteTicket, setShowDeleteTicket] = useState<
@@ -99,15 +74,35 @@ export default function App() {
     ticket: null,
   });
 
-  const handleShowAddBoardClick = useCallback(
-    (organisationId: string) => setShowAddBoard({ show: true, organisationId }),
-    [],
+  const [showBoardModal, closeBoardModal] = useModal(
+    () => (
+      <BoardModal
+        organisationId={organisationId ?? ""}
+        board={activeBoard}
+        onClose={closeBoardModal}
+      />
+    ),
+    [activeBoard, organisationId],
   );
 
-  const handleShowEditBoardClick = useCallback(
-    (organisationId: string, board: Board) =>
-      setShowEditBoard({ show: true, organisationId, board }),
-    [],
+  const [showTicketModal, closeTicketModal] = useModal(
+    () => (
+      <TicketModal
+        organisationId={organisationId ?? ""}
+        boardId={activeBoard?.id ?? ""}
+        ticket={activeTicket}
+        onClose={closeTicketModal}
+      />
+    ),
+    [activeBoard, organisationId],
+  );
+
+  const handleShowAddEditBoardClick = useCallback(
+    (board: Board) => {
+      setActiveBoard(board);
+      showBoardModal();
+    },
+    [showBoardModal],
   );
 
   const handleShowDeleteBoardClick = useCallback(
@@ -116,16 +111,13 @@ export default function App() {
     [],
   );
 
-  const handleShowAddTicketClick = useCallback(
-    (organisationId: string, boardId: string) =>
-      setShowAddTicket({ show: true, organisationId, boardId }),
-    [],
-  );
-
-  const handleShowEditTicketClick = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) =>
-      setShowEditTicket({ show: true, organisationId, boardId, ticket }),
-    [],
+  const handleShowAddEditTicketClick = useCallback(
+    (board: Board, ticket: Ticket | null) => {
+      setActiveBoard(board);
+      setActiveTicket(ticket);
+      showTicketModal();
+    },
+    [showTicketModal],
   );
 
   const handleShowDeleteTicketClick = useCallback(
@@ -133,22 +125,6 @@ export default function App() {
       setShowDeleteTicket({ show: true, organisationId, boardId, ticket }),
     [],
   );
-
-  const handleEditBoard = useCallback(
-    (organisationId: string, board: Board) =>
-      addOrEditBoard({
-        variables: {
-          organisationId,
-          boardId: board.id,
-          input: { name: board.name },
-        },
-      }),
-    [addOrEditBoard],
-  );
-
-  const handleDeleteBoard = useCallback(() => {
-    // deleteBoard({ variables: { organisationId, ticketId: ticket.id } });
-  }, []);
 
   const handleDeleteTicket = useCallback(
     async (organisationId: string, _boardId: string, ticket: Ticket) => {
@@ -195,9 +171,7 @@ export default function App() {
 
       <div style={{ padding: 8 }}>
         <h2>Boards</h2>
-        <button onClick={() => handleShowAddBoardClick(organisation.id)}>
-          Add board
-        </button>
+        <button onClick={() => showBoardModal()}>Add board</button>
 
         <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
           {organisation.boards.map((b) => (
@@ -223,18 +197,12 @@ export default function App() {
                 <h3>{b.name}</h3>
 
                 <button
-                  onClick={() =>
-                    handleShowAddTicketClick(organisation.id, b.id)
-                  }
+                  onClick={() => handleShowAddEditTicketClick(b as Board, null)}
                 >
                   Add ticket
                 </button>
 
-                <button
-                  onClick={() =>
-                    handleShowEditBoardClick(organisation.id, b as Board)
-                  }
-                >
+                <button onClick={() => handleShowAddEditBoardClick(b as Board)}>
                   Edit board
                 </button>
 
@@ -280,9 +248,8 @@ export default function App() {
                         </span>{" "}
                         <button
                           onClick={() =>
-                            handleShowEditTicketClick(
-                              organisation.id,
-                              b.id,
+                            handleShowAddEditTicketClick(
+                              b as Board,
                               t as Ticket,
                             )
                           }
@@ -324,55 +291,6 @@ export default function App() {
         </details>
       </div>
 
-      {showAddBoard.show &&
-        showAddBoard.organisationId &&
-        createPortal(
-          <>
-            <Overlay />
-            <dialog
-              open
-              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
-            >
-              <ModalHeader
-                title="Add Board"
-                onClose={() => setShowAddBoard({ show: false })}
-              />
-
-              <BoardForm
-                organisationId={showAddBoard.organisationId}
-                onClose={() => setShowAddBoard({ show: false })}
-              />
-            </dialog>
-          </>,
-          document.getElementById("modal")!,
-        )}
-
-      {showEditBoard.show &&
-        showEditBoard.organisationId &&
-        showEditBoard.board &&
-        createPortal(
-          <>
-            <Overlay />
-            <dialog
-              open
-              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
-            >
-              <ModalHeader
-                title="Edit Board"
-                onClose={() => setShowEditBoard({ show: false, board: null })}
-              />
-
-              <BoardForm
-                organisationId={showEditBoard.organisationId}
-                board={showEditBoard.board}
-                onSubmit={handleEditBoard}
-                onClose={() => setShowEditBoard({ show: false, board: null })}
-              />
-            </dialog>
-          </>,
-          document.getElementById("modal")!,
-        )}
-
       {showDeleteBoard.show &&
         showDeleteBoard.organisationId &&
         showDeleteBoard.board &&
@@ -391,60 +309,7 @@ export default function App() {
               <DeleteBoardForm
                 organisationId={showDeleteBoard.organisationId}
                 board={showDeleteBoard.board}
-                onSubmit={handleDeleteBoard}
                 onClose={() => setShowDeleteBoard({ show: false, board: null })}
-              />
-            </dialog>
-          </>,
-          document.getElementById("modal")!,
-        )}
-
-      {showAddTicket.show &&
-        showAddTicket.organisationId &&
-        showAddTicket.boardId &&
-        createPortal(
-          <>
-            <Overlay />
-            <dialog
-              open
-              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
-            >
-              <ModalHeader
-                title="Add Ticket"
-                onClose={() => setShowAddTicket({ show: false })}
-              />
-
-              <TicketForm
-                organisationId={showAddTicket.organisationId}
-                boardId={showAddTicket.boardId}
-                onClose={() => setShowAddTicket({ show: false })}
-              />
-            </dialog>
-          </>,
-          document.getElementById("modal")!,
-        )}
-
-      {showEditTicket.show &&
-        showEditTicket.organisationId &&
-        showEditTicket.boardId &&
-        showEditTicket.ticket &&
-        createPortal(
-          <>
-            <Overlay />
-            <dialog
-              open
-              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
-            >
-              <ModalHeader
-                title="Edit Ticket"
-                onClose={() => setShowEditTicket({ show: false })}
-              />
-
-              <TicketForm
-                organisationId={showEditTicket.organisationId}
-                boardId={showEditTicket.boardId}
-                ticket={showEditTicket.ticket}
-                onClose={() => setShowEditTicket({ show: false })}
               />
             </dialog>
           </>,
