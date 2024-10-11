@@ -2,49 +2,74 @@ import { type FormEvent, useCallback } from "react";
 
 import { type Board } from "../__generated__/graphql";
 import useForm from "../useForm";
+import { useMutation } from "@apollo/client";
+import { PUT_BOARD } from "../queries";
+
+interface BoardViewModel {
+  id?: Board["id"];
+  name: Board["name"];
+}
+
+const defaultNewBoard: BoardViewModel = {
+  name: "",
+};
 
 export default function BoardForm({
   organisationId,
   board = null,
-  onSubmit,
   onClose,
 }: {
   organisationId: string;
   board?: Board | null;
-  onSubmit?: (organisationId: string, board: Board) => void;
   onClose?: () => void;
 }) {
-  const { data, handleChange } = useForm<Board>(board);
+  const [addOrEditBoard] = useMutation(PUT_BOARD);
 
-  const handleSubmit = useCallback(
-    (e: FormEvent) => {
-      e.preventDefault();
+  const { formData, formState, handleChange, handleSubmit, setError } =
+    useForm<BoardViewModel>(board ?? defaultNewBoard);
 
-      // TODO: Validation checks on data
+  const onSubmit = useCallback(
+    (e: FormEvent) =>
+      void handleSubmit(async (board: BoardViewModel) => {
+        const { id, ...input } = board;
 
-      onSubmit?.(organisationId, data);
-      onClose?.();
-    },
-    [data, onClose, onSubmit, organisationId],
+        try {
+          await addOrEditBoard({
+            variables: {
+              organisationId,
+
+              boardId: id,
+              input,
+            },
+          });
+
+          onClose?.();
+        } catch {
+          setError("__root__", "Something went wrong, please try again");
+        }
+      })(e),
+    [addOrEditBoard, handleSubmit, onClose, organisationId, setError],
   );
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       style={{ display: "flex", gap: 8, flexDirection: "column" }}
     >
       <label>
-        Name{" "}
+        Name
         <input
           required
           type="text"
           name="name"
-          value={data.name}
+          value={formData.name}
           onChange={handleChange}
         />
       </label>
 
-      <button>Save</button>
+      <button disabled={formState.isSubmitting}>
+        {formState.isSubmitting ? "Saving…" : "Save"}
+      </button>
     </form>
   );
 }

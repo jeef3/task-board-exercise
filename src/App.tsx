@@ -3,13 +3,7 @@ import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 import { Board, Ticket } from "./__generated__/graphql";
-import {
-  DELETE_TICKET,
-  GET_ME,
-  GET_ORGANISATION,
-  PUT_BOARD,
-  PUT_TICKET,
-} from "./queries";
+import { DELETE_TICKET, GET_ME, GET_ORGANISATION, PUT_BOARD } from "./queries";
 import BoardForm from "./components/BoardForm";
 import Overlay from "./components/Overlay";
 import ModalHeader from "./components/ModalHeader";
@@ -58,7 +52,6 @@ export default function App() {
 
   const [addOrEditBoard] = useMutation(PUT_BOARD);
   // const [deleteBoard] = useMutation(DELETE_BOARD);
-  const [addOrEditTicket] = useMutation(PUT_TICKET);
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
   const [showAddBoard, setShowAddBoard] = useState<BoardModalState>({
@@ -141,20 +134,6 @@ export default function App() {
     [],
   );
 
-  const handleAddBoard = useCallback(
-    async (organisationId: string, board: Board) => {
-      await addOrEditBoard({
-        variables: {
-          organisationId,
-          input: { name: board.name },
-        },
-      });
-
-      await refetch();
-    },
-    [addOrEditBoard, refetch],
-  );
-
   const handleEditBoard = useCallback(
     (organisationId: string, board: Board) =>
       addOrEditBoard({
@@ -170,44 +149,6 @@ export default function App() {
   const handleDeleteBoard = useCallback(() => {
     // deleteBoard({ variables: { organisationId, ticketId: ticket.id } });
   }, []);
-
-  const handleAddTicket = useCallback(
-    async (organisationId: string, boardId: string, ticket: Ticket) => {
-      await addOrEditTicket({
-        variables: {
-          organisationId,
-          boardId,
-          input: {
-            name: ticket.name,
-            description: ticket.description,
-            status: ticket.status,
-            visible: ticket.visible,
-          },
-        },
-      });
-
-      await refetch();
-    },
-    [addOrEditTicket, refetch],
-  );
-
-  const handleEditTicket = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) =>
-      addOrEditTicket({
-        variables: {
-          organisationId,
-          boardId,
-          ticketId: ticket.id,
-          input: {
-            name: ticket.name,
-            description: ticket.description,
-            status: ticket.status,
-            visible: ticket.visible,
-          },
-        },
-      }),
-    [addOrEditTicket],
-  );
 
   const handleDeleteTicket = useCallback(
     async (organisationId: string, _boardId: string, ticket: Ticket) => {
@@ -399,7 +340,6 @@ export default function App() {
 
               <BoardForm
                 organisationId={showAddBoard.organisationId}
-                onSubmit={handleAddBoard}
                 onClose={() => setShowAddBoard({ show: false })}
               />
             </dialog>
@@ -477,9 +417,6 @@ export default function App() {
               <TicketForm
                 organisationId={showAddTicket.organisationId}
                 boardId={showAddTicket.boardId}
-                onSubmit={(oId, bId, ticket) =>
-                  handleAddTicket(oId, bId, ticket)
-                }
                 onClose={() => setShowAddTicket({ show: false })}
               />
             </dialog>
@@ -507,7 +444,6 @@ export default function App() {
                 organisationId={showEditTicket.organisationId}
                 boardId={showEditTicket.boardId}
                 ticket={showEditTicket.ticket}
-                onSubmit={handleEditTicket}
                 onClose={() => setShowEditTicket({ show: false })}
               />
             </dialog>

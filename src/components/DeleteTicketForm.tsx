@@ -16,7 +16,7 @@ export default function DeleteTicketForm({
   onSubmit?: (organisationId: string, boardId: string, ticket: Ticket) => void;
   onClose?: () => void;
 }) {
-  const { data } = useForm<Ticket>(
+  const { formData: data } = useForm<Ticket>(
     ticket ?? ({ name: "", status: "TODO", visible: true } as Ticket),
   );
 

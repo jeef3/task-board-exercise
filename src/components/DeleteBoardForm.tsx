@@ -14,7 +14,7 @@ export default function DeleteBoardForm({
   onSubmit?: (organisationId: string, board: Board) => void;
   onClose?: () => void;
 }) {
-  const { data } = useForm<Board>(board);
+  const { formData: data } = useForm<Board>(board);
 
   const handleSubmit = useCallback(
     (e: FormEvent) => {
