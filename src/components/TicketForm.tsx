@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 
 import { TicketStatus, type Ticket } from "../__generated__/graphql";
 import { PUT_TICKET } from "../queries";
-import useForm from "../useForm";
+import useForm from "../hooks/useForm";
 
 interface TicketViewModel {
   id?: Ticket["id"];

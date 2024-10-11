@@ -1,7 +1,7 @@
 import { type FormEvent, useCallback } from "react";
 
 import { type Board } from "../__generated__/graphql";
-import useForm from "../useForm";
+import useForm from "../hooks/useForm";
 
 export default function DeleteBoardForm({
   organisationId,
