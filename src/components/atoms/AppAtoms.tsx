@@ -22,6 +22,8 @@ export const AppHeaderContainer = styled.header`
 `;
 
 export const AppBody = styled.main`
+  overflow: hidden;
+
   display: grid;
   grid-template-rows: [board-header] auto [columns] 1fr;
 `;
