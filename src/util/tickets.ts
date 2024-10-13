@@ -11,17 +11,20 @@ export interface TicketBucket {
 }
 
 export function reduce_bucketByStatus(buckets: TicketBucket[], ticket: Ticket) {
-  let bucket = buckets.find((b) => b.status === ticket.status);
+  const existingBucket = buckets.find(
+    (bucket) => bucket.status === ticket.status,
+  );
 
-  // Naive handling in case we meet an unexpected status.
-  if (!bucket) {
-    bucket = { name: ticket.status, status: ticket.status, tickets: [ticket] };
-    buckets.push(bucket);
-
-    return buckets;
+  if (!existingBucket) {
+    // Create a new bucket with the status as a name
+    buckets.push({
+      name: ticket.status,
+      status: ticket.status,
+      tickets: [ticket],
+    });
+  } else {
+    existingBucket.tickets.push(ticket);
   }
-
-  bucket.tickets.push(ticket);
 
   return buckets;
 }
