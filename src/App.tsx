@@ -20,12 +20,7 @@ import type {
 } from "./__generated__/graphql";
 import { useCurrentOrg } from "./hooks/hooks";
 import Button from "./components/Button";
-import {
-  IconDotsVertical,
-  IconGripVertical,
-  IconPlus,
-  IconSquarePlus2,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconSquarePlus2 } from "@tabler/icons-react";
 
 interface TicketModalState {
   show: boolean;
@@ -36,14 +31,6 @@ interface TicketModalState {
 
 export default function App() {
   const { data: { organisation } = {}, refetch } = useCurrentOrg();
-
-  // const { data: dataSub, loading: loadingSub } = useSubscription(
-  //   SUBSCRIPTION_TICKETS,
-  //   {
-  //     skip: !organisationId,
-  //     variables: { organisationId: organisationId ?? "" },
-  //   },
-  // );
 
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
