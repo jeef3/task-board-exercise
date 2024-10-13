@@ -6,15 +6,12 @@ export function useCurrentUser() {
 }
 
 export function useCurrentOrg() {
-  const { data } = useCurrentUser();
+  const { data: { me } = {} } = useCurrentUser();
 
-  const { me } = data ?? {};
   const organisationId = me?.memberships[0]?.organisation.id;
 
-  const userLoaded = !!organisationId;
-
   return useQuery(GET_ORGANISATION, {
-    skip: !userLoaded,
+    skip: !organisationId,
     variables: { organisationId: organisationId ?? "" },
   });
 }

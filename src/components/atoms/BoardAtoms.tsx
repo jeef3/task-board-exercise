@@ -21,6 +21,7 @@ export const BoardColumn = styled.article`
   border-radius: 10px;
 
   background: hsl(240 10% 90%);
+  box-shadow: 0 2px 2px hsl(0 0% 0% / 25%);
 
   display: grid;
   grid-template-rows: [header] auto [tickets] 1fr [footer] auto;
@@ -41,7 +42,7 @@ export const BoardColumnHeader = styled.header`
 export const BoardColumnContent = styled.div`
   overflow: auto;
 
-  padding: 4px;
+  padding: 0 8px;
 `;
 
 export const BoardColumnFooter = styled.footer`

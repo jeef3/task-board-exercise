@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import ContentLoader from "react-content-loader";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import CL from "react-content-loader";
 import styled from "styled-components";
 
 const TextLoaderContainer = styled.span`
@@ -8,7 +8,28 @@ const TextLoaderContainer = styled.span`
   }
 `;
 
-export const TextLoader = ({ width }: { width: number }) => {
+const ContentLoader = ({
+  children,
+  width,
+  height,
+}: {
+  children?: ReactElement;
+  width?: string | number;
+  height?: string | number;
+}) => (
+  <CL
+    foregroundColor="hsl(0 0% 70% / 20%)"
+    backgroundColor="hsl(0 0% 60% / 20%)"
+    title="Loading…"
+    width={width}
+    height={height}
+    viewBox={`0 0 ${width} ${height}`}
+  >
+    {children}
+  </CL>
+);
+
+export function TextLoader({ width }: { width: number }) {
   const el = useRef<HTMLSpanElement>(null);
 
   const [boxHeight, setBoxHeight] = useState<number>(0);
@@ -36,16 +57,25 @@ export const TextLoader = ({ width }: { width: number }) => {
 
   return (
     <TextLoaderContainer ref={el}>
-      <ContentLoader
-        foregroundColor="hsl(0 0% 70% / 50%)"
-        backgroundColor="hsl(0 0% 60% / 50%)"
-        title="Loading…"
-        width={width}
-        height={boxHeight}
-        viewBox={`0 0 ${width} ${boxHeight}`}
-      >
+      <ContentLoader width={width} height={boxHeight}>
         <rect y={textHeight * 0.2} width={width} height={textHeight} rx={4} />
       </ContentLoader>
     </TextLoaderContainer>
   );
-};
+}
+
+export function BoxLoader({
+  width = "100%",
+  height = 10,
+  radius = 4,
+}: {
+  width?: string | number;
+  height?: string | number;
+  radius?: number;
+}) {
+  return (
+    <ContentLoader width={width} height={height}>
+      <rect width={width} height={height} rx={radius} />
+    </ContentLoader>
+  );
+}

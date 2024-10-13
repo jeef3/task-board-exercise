@@ -1,9 +1,9 @@
-import { useQuery, useMutation } from "@apollo/client";
-import { useState, useCallback } from "react";
+import { useMutation } from "@apollo/client";
+import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useModal } from "react-modal-hook";
 
-import { DELETE_TICKET, GET_ME, GET_ORGANISATION } from "./queries";
+import { DELETE_TICKET } from "./queries";
 import { AppBody, AppContainer } from "./components/atoms/AppAtoms";
 import AppHeader from "./components/AppHeader";
 import Overlay from "./components/Overlay";
@@ -18,7 +18,8 @@ import type {
   Board as TBoard,
   Ticket as TTicket,
 } from "./__generated__/graphql";
-import { useCurrentOrg, useCurrentUser } from "./hooks/hooks";
+import { useCurrentOrg } from "./hooks/hooks";
+import Button from "./components/Button";
 
 interface TicketModalState {
   show: boolean;
@@ -40,6 +41,7 @@ export default function App() {
 
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
+  const [board, setBoard] = useState<TBoard | null>(null);
   const [activeBoard, setActiveBoard] = useState<TBoard | null>(null);
   const [activeTicket, setActiveTicket] = useState<TTicket | null>(null);
 
@@ -127,6 +129,16 @@ export default function App() {
     [deleteTicket, refetch],
   );
 
+  useEffect(() => {
+    if (!organisation) return;
+
+    const firstBoard = organisation.boards[0];
+
+    if (!firstBoard) return;
+
+    setBoard(firstBoard as TBoard);
+  }, [organisation]);
+
   // if (loadingMe || loadingOrg) return <p>Loading…</p>;
   // if (errorMe || errorOrg)
   //   return (
@@ -150,11 +162,14 @@ export default function App() {
         <AppBody>
           <div style={{ display: "flex" }}>
             <h2>Boards</h2>
+            {organisation?.boards.map((board) => (
+              <Button onClick={() => setBoard(board as TBoard)}>
+                {board.name}
+              </Button>
+            ))}
             <button onClick={() => showBoardModal()}>Add board</button>
           </div>
-          {organisation?.boards && (
-            <BoardStatusColumns board={organisation.boards[0] as TBoard} />
-          )}
+          <BoardStatusColumns board={board} />
         </AppBody>
       </AppContainer>
 

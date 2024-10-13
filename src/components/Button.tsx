@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const Button = styled.button<{
-  $type: "transparent" | "action" | "destructive";
+  $type?: "transparent" | "action" | "destructive";
 }>`
   --base: ${({ $type = "transparent" }) =>
     $type === "transparent" ? "transparent" : "hsl(0 0% 95%)"};
