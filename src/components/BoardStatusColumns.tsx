@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { IconSquarePlus } from "@tabler/icons-react";
 
 import { type Board as TBoard, TicketStatus } from "../__generated__/graphql";
