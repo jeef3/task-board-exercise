@@ -4,29 +4,20 @@ import { createPortal } from "react-dom";
 import { useModal } from "react-modal-hook";
 
 import { DELETE_TICKET, GET_ME, GET_ORGANISATION } from "./queries";
+import { AppBody, AppContainer } from "./components/atoms/AppAtoms";
+import AppHeader from "./components/AppHeader";
 import Overlay from "./components/Overlay";
 import ModalHeader from "./components/ModalHeader";
 import DeleteTicketForm from "./components/DeleteTicketForm";
-import BoardLists from "./components/BoardLists";
+import BoardStatusColumns from "./components/BoardStatusColumns";
 import BoardModal from "./modals/AddEditBoardModal";
 import TicketModal from "./modals/AddEditTicketModal";
 import DeleteBoardModal from "./modals/DeleteBoardModal";
-
-const AppContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-
-  background: blue;
-
-  display: grid;
-  grid-template-rows: [header] auto [main] 1fr;
-`;
 
 import type {
   Board as TBoard,
   Ticket as TTicket,
 } from "./__generated__/graphql";
-import styled from "styled-components";
 
 interface TicketModalState {
   show: boolean;
@@ -150,52 +141,34 @@ export default function App() {
     [deleteTicket, refetch],
   );
 
-  if (loadingMe || loadingOrg) return <p>Loading…</p>;
-  if (errorMe || errorOrg)
-    return (
-      <p>
-        Error:{" "}
-        {errorMe
-          ? errorMe.message
-          : errorOrg
-            ? errorOrg.message
-            : "Unknown error"}
-      </p>
-    );
-  if (!me) return <p>No me data</p>;
-  if (!organisation) return <p>No org data</p>;
+  // if (loadingMe || loadingOrg) return <p>Loading…</p>;
+  // if (errorMe || errorOrg)
+  //   return (
+  //     <p>
+  //       Error:{" "}
+  //       {errorMe
+  //         ? errorMe.message
+  //         : errorOrg
+  //           ? errorOrg.message
+  //           : "Unknown error"}
+  //     </p>
+  //   );
+  // if (!me) return <p>No me data</p>;
+  // if (!organisation) return <p>No org data</p>;
 
   return (
     <>
       <AppContainer>
-        <header
-          style={{
-            padding: 16,
-            color: "hsl(0 0% 100%)",
-            background: "hsl(0 0% 10%)",
-
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          {organisation.name}
-          <span>
-            {me.firstName} {me.lastName}
-          </span>
-        </header>
-        <main
-          style={{
-            overflow: "hidden",
-            display: "grid",
-            gridTemplateRows: "[board-header] auto [lists] 1fr",
-          }}
-        >
+        <AppHeader />
+        <AppBody>
           <div style={{ display: "flex" }}>
             <h2>Boards</h2>
             <button onClick={() => showBoardModal()}>Add board</button>
           </div>
-          <BoardLists board={organisation.boards[0] as TBoard} />
-        </main>
+          {organisation?.boards && (
+            <BoardStatusColumns board={organisation.boards[0] as TBoard} />
+          )}
+        </AppBody>
       </AppContainer>
 
       {showDeleteTicket.show &&
