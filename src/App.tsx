@@ -18,6 +18,7 @@ import type {
   Board as TBoard,
   Ticket as TTicket,
 } from "./__generated__/graphql";
+import { useCurrentOrg, useCurrentUser } from "./hooks/hooks";
 
 interface TicketModalState {
   show: boolean;
@@ -27,22 +28,7 @@ interface TicketModalState {
 }
 
 export default function App() {
-  const { loading: loadingMe, error: errorMe, data: dataMe } = useQuery(GET_ME);
-
-  const { me } = dataMe ?? {};
-  const organisationId = me?.memberships[0]?.organisation.id;
-
-  const {
-    loading: loadingOrg,
-    error: errorOrg,
-    data: dataOrg,
-    refetch,
-  } = useQuery(GET_ORGANISATION, {
-    skip: !organisationId,
-    variables: { organisationId: organisationId ?? "" },
-  });
-
-  const { organisation } = dataOrg ?? {};
+  const { data: { organisation } = {}, refetch } = useCurrentOrg();
 
   // const { data: dataSub, loading: loadingSub } = useSubscription(
   //   SUBSCRIPTION_TICKETS,
@@ -69,35 +55,35 @@ export default function App() {
   const [showBoardModal, closeBoardModal] = useModal(
     () => (
       <BoardModal
-        organisationId={organisationId ?? ""}
+        organisationId={organisation?.id ?? ""}
         board={activeBoard}
         onClose={closeBoardModal}
       />
     ),
-    [activeBoard, organisationId],
+    [activeBoard, organisation],
   );
 
   const [showDeleteBoardModal, closeDeleteBoardModal] = useModal(
     () => (
       <DeleteBoardModal
-        organisationId={organisationId ?? ""}
+        organisationId={organisation?.id ?? ""}
         board={activeBoard}
         onClose={closeDeleteBoardModal}
       />
     ),
-    [activeBoard, organisationId],
+    [activeBoard, organisation],
   );
 
   const [showTicketModal, closeTicketModal] = useModal(
     () => (
       <TicketModal
-        organisationId={organisationId ?? ""}
+        organisationId={organisation?.id ?? ""}
         boardId={activeBoard?.id ?? ""}
         ticket={activeTicket}
         onClose={closeTicketModal}
       />
     ),
-    [activeBoard, organisationId],
+    [activeBoard, organisation],
   );
 
   const handleShowAddEditBoardClick = useCallback(
@@ -160,6 +146,7 @@ export default function App() {
     <>
       <AppContainer>
         <AppHeader />
+
         <AppBody>
           <div style={{ display: "flex" }}>
             <h2>Boards</h2>

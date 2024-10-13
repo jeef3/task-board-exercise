@@ -38,7 +38,7 @@ export default function BoardStatusColumns({ board }: { board: TBoard }) {
 
   return (
     <BoardContainer>
-      <UnstyledList as="ol">
+      <UnstyledList as="ol" $gutter={10}>
         {buckets.map((bucket) => (
           <li key={bucket.status}>
             <BoardColumn>

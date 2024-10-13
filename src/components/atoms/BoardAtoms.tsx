@@ -7,8 +7,6 @@ export const BoardContainer = styled.div`
 
   list-style: none;
 
-  background: red;
-
   > * {
     max-height: 100%;
     width: 100%;
@@ -17,19 +15,19 @@ export const BoardContainer = styled.div`
 
 export const BoardColumn = styled.article`
   overflow: hidden;
-  width: 400px;
+  width: 300px;
   max-height: 100%;
 
   border-radius: 10px;
 
-  background: hsl(0 0% 95%);
+  background: hsl(240 10% 90%);
 
   display: grid;
   grid-template-rows: [header] auto [tickets] 1fr [footer] auto;
 `;
 
 export const BoardColumnHeader = styled.header`
-  padding: 8px 4px;
+  padding: 8px;
 
   display: flex;
   align-items: center;
