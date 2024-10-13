@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 const Button = styled.button<{
+  $active?: boolean;
   $type?: "transparent" | "action" | "destructive";
 }>`
   --base: ${({ $type = "transparent" }) =>
@@ -15,6 +16,13 @@ const Button = styled.button<{
   border-radius: 6px;
   background: var(--base);
 
+  ${({ $active = false }) =>
+    $active &&
+    `
+  background: color-mix(in hsl, var(--base), black 5%);
+  box-shadow: inset 0 1px 2px hsl(0 0% 0% / 20%);
+  `}
+
   display: flex;
   align-items: center;
   gap: 4px;
@@ -23,7 +31,7 @@ const Button = styled.button<{
 
   &:hover {
     color: color-mix(in hsl, var(--base), black 50%);
-    background: color-mix(in hsl, var(--base), black 5%);
+    background: color-mix(in hsl, var(--base), black 8%);
   }
 
   &:active {

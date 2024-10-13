@@ -53,7 +53,15 @@ export default function BoardStatusColumns({
 
                 <BoardColumnContent>
                   {!bucket.tickets.length ? (
-                    <div>This status as no tickets, yet!</div>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        fontSize: 18,
+                        color: "hsl(240 10% 75% )",
+                      }}
+                    >
+                      No tickets!
+                    </div>
                   ) : (
                     <UnstyledList as="ul" $direction="column">
                       {bucket.tickets.map((t) => (

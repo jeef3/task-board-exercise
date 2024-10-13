@@ -20,6 +20,12 @@ import type {
 } from "./__generated__/graphql";
 import { useCurrentOrg } from "./hooks/hooks";
 import Button from "./components/Button";
+import {
+  IconDotsVertical,
+  IconGripVertical,
+  IconPlus,
+  IconSquarePlus2,
+} from "@tabler/icons-react";
 
 interface TicketModalState {
   show: boolean;
@@ -41,7 +47,6 @@ export default function App() {
 
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
-  const [board, setBoard] = useState<TBoard | null>(null);
   const [activeBoard, setActiveBoard] = useState<TBoard | null>(null);
   const [activeTicket, setActiveTicket] = useState<TTicket | null>(null);
 
@@ -136,7 +141,7 @@ export default function App() {
 
     if (!firstBoard) return;
 
-    setBoard(firstBoard as TBoard);
+    setActiveBoard(firstBoard as TBoard);
   }, [organisation]);
 
   // if (loadingMe || loadingOrg) return <p>Loading…</p>;
@@ -160,16 +165,31 @@ export default function App() {
         <AppHeader />
 
         <AppBody>
-          <div style={{ display: "flex" }}>
-            <h2>Boards</h2>
-            {organisation?.boards.map((board) => (
-              <Button onClick={() => setBoard(board as TBoard)}>
-                {board.name}
+          <div
+            style={{
+              padding: 8,
+              display: "flex",
+              gap: 4,
+              alignItems: "center",
+              background: "hsl(240 45% 80%)",
+            }}
+          >
+            {organisation?.boards.map((b) => (
+              <Button
+                onClick={() => setActiveBoard(b as TBoard)}
+                $active={b === activeBoard}
+              >
+                {b.name}
               </Button>
             ))}
-            <button onClick={() => showBoardModal()}>Add board</button>
+
+            <IconDotsVertical size="1em" color="hsl(0 0% 0% / 20%)" />
+
+            <Button onClick={() => showBoardModal()}>
+              <IconSquarePlus2 size="1em" /> Add board
+            </Button>
           </div>
-          <BoardStatusColumns board={board} />
+          <BoardStatusColumns board={activeBoard} />
         </AppBody>
       </AppContainer>
 
