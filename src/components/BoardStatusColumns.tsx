@@ -10,14 +10,14 @@ import {
 import UnstyledList from "./atoms/UnstyledList";
 import {
   BoardColumn,
-  BoardColumnContent,
-  BoardColumnFooter,
-  BoardColumnHeader,
+  ColumnContent,
+  ColumnFooter,
+  ColumnHeader,
+  TicketCount,
   BoardContainer,
 } from "./atoms/BoardAtoms";
 import Button from "./Button";
 import Ticket from "./Ticket";
-import { useCurrentOrg } from "../hooks/hooks";
 import { BoxLoader, TextLoader } from "./ContentLoader";
 
 const makeInitialBuckets = (): TicketBucket[] => [
@@ -46,12 +46,12 @@ export default function BoardStatusColumns({
           buckets.map((bucket) => (
             <li key={bucket.status}>
               <BoardColumn>
-                <BoardColumnHeader>
+                <ColumnHeader>
                   <h3>{bucket.name}</h3>
-                  <div>{bucket.tickets.length}</div>
-                </BoardColumnHeader>
+                  <TicketCount>{bucket.tickets.length}</TicketCount>
+                </ColumnHeader>
 
-                <BoardColumnContent>
+                <ColumnContent>
                   {!bucket.tickets.length ? (
                     <div
                       style={{
@@ -71,13 +71,13 @@ export default function BoardStatusColumns({
                       ))}
                     </UnstyledList>
                   )}
-                </BoardColumnContent>
+                </ColumnContent>
 
-                <BoardColumnFooter>
+                <ColumnFooter>
                   <Button $type="transparent">
                     <IconSquarePlus size="16" /> Add ticket
                   </Button>
-                </BoardColumnFooter>
+                </ColumnFooter>
               </BoardColumn>
             </li>
           ))
@@ -104,10 +104,10 @@ function ColumnLoading() {
 
   return (
     <BoardColumn>
-      <BoardColumnHeader>
+      <ColumnHeader>
         <TextLoader width={120} />
-      </BoardColumnHeader>
-      <BoardColumnContent>
+      </ColumnHeader>
+      <ColumnContent>
         <UnstyledList as="ul" $direction="column">
           {Array.from(Array(ticketCount)).map(() => (
             <li>
@@ -115,8 +115,8 @@ function ColumnLoading() {
             </li>
           ))}
         </UnstyledList>
-      </BoardColumnContent>
-      <BoardColumnFooter></BoardColumnFooter>
+      </ColumnContent>
+      <ColumnFooter></ColumnFooter>
     </BoardColumn>
   );
 }

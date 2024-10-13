@@ -27,7 +27,7 @@ export const BoardColumn = styled.article`
   grid-template-rows: [header] auto [tickets] 1fr [footer] auto;
 `;
 
-export const BoardColumnHeader = styled.header`
+export const ColumnHeader = styled.header`
   padding: 8px;
 
   display: flex;
@@ -39,14 +39,29 @@ export const BoardColumnHeader = styled.header`
   }
 `;
 
-export const BoardColumnContent = styled.div`
+export const ColumnContent = styled.div`
   overflow: auto;
 
   padding: 0 8px;
 `;
 
-export const BoardColumnFooter = styled.footer`
+export const ColumnFooter = styled.footer`
   padding: 8px;
 
   display: grid;
+`;
+
+export const TicketCount = styled.div`
+  width: 18px;
+  height: 18px;
+
+  color: hsl(0 0% 0% / 50%);
+  font-size: 12px;
+
+  border-radius: 18px;
+  background: hsl(0 0% 0% / 10%);
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
 `;
