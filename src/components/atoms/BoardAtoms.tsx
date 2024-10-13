@@ -46,5 +46,7 @@ export const BoardColumnContent = styled.div`
 `;
 
 export const BoardColumnFooter = styled.footer`
-  padding: 4px;
+  padding: 8px;
+
+  display: grid;
 `;
