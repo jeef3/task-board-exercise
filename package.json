@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
+    "@tabler/icons-react": "^3.19.0",
     "graphql-ws": "^5.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-modal-hook": "^3.0.2"
+    "react-modal-hook": "^3.0.2",
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

@@ -3,20 +3,30 @@ import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useModal } from "react-modal-hook";
 
-import { Board, Ticket } from "./__generated__/graphql";
 import { DELETE_TICKET, GET_ME, GET_ORGANISATION } from "./queries";
 import Overlay from "./components/Overlay";
 import ModalHeader from "./components/ModalHeader";
 import DeleteTicketForm from "./components/DeleteTicketForm";
-import DeleteBoardForm from "./components/DeleteBoardForm";
+import BoardLists from "./components/BoardLists";
 import BoardModal from "./modals/AddEditBoardModal";
 import TicketModal from "./modals/AddEditTicketModal";
+import DeleteBoardModal from "./modals/DeleteBoardModal";
 
-interface BoardModalState {
-  show: boolean;
+const AppContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
 
-  organisationId?: string | null;
-}
+  background: blue;
+
+  display: grid;
+  grid-template-rows: [header] auto [main] 1fr;
+`;
+
+import type {
+  Board as TBoard,
+  Ticket as TTicket,
+} from "./__generated__/graphql";
+import styled from "styled-components";
 
 interface TicketModalState {
   show: boolean;
@@ -51,22 +61,13 @@ export default function App() {
   //   },
   // );
 
-  // const [deleteBoard] = useMutation(DELETE_BOARD);
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
-  const [activeBoard, setActiveBoard] = useState<Board | null>(null);
-  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
-
-  const [showDeleteBoard, setShowDeleteBoard] = useState<
-    BoardModalState & { board?: Board | null }
-  >({
-    show: false,
-    organisationId: null,
-    board: null,
-  });
+  const [activeBoard, setActiveBoard] = useState<TBoard | null>(null);
+  const [activeTicket, setActiveTicket] = useState<TTicket | null>(null);
 
   const [showDeleteTicket, setShowDeleteTicket] = useState<
-    TicketModalState & { ticket?: Ticket | null }
+    TicketModalState & { ticket?: TTicket | null }
   >({
     show: false,
     organisationId: null,
@@ -85,6 +86,17 @@ export default function App() {
     [activeBoard, organisationId],
   );
 
+  const [showDeleteBoardModal, closeDeleteBoardModal] = useModal(
+    () => (
+      <DeleteBoardModal
+        organisationId={organisationId ?? ""}
+        board={activeBoard}
+        onClose={closeDeleteBoardModal}
+      />
+    ),
+    [activeBoard, organisationId],
+  );
+
   const [showTicketModal, closeTicketModal] = useModal(
     () => (
       <TicketModal
@@ -98,7 +110,7 @@ export default function App() {
   );
 
   const handleShowAddEditBoardClick = useCallback(
-    (board: Board) => {
+    (board: TBoard) => {
       setActiveBoard(board);
       showBoardModal();
     },
@@ -106,13 +118,15 @@ export default function App() {
   );
 
   const handleShowDeleteBoardClick = useCallback(
-    (organisationId: string, board: Board) =>
-      setShowDeleteBoard({ show: true, organisationId, board }),
-    [],
+    (board: TBoard) => {
+      setActiveBoard(board);
+      showDeleteBoardModal();
+    },
+    [showDeleteBoardModal],
   );
 
   const handleShowAddEditTicketClick = useCallback(
-    (board: Board, ticket: Ticket | null) => {
+    (board: TBoard, ticket: TTicket | null) => {
       setActiveBoard(board);
       setActiveTicket(ticket);
       showTicketModal();
@@ -121,13 +135,13 @@ export default function App() {
   );
 
   const handleShowDeleteTicketClick = useCallback(
-    (organisationId: string, boardId: string, ticket: Ticket) =>
+    (organisationId: string, boardId: string, ticket: TTicket) =>
       setShowDeleteTicket({ show: true, organisationId, boardId, ticket }),
     [],
   );
 
   const handleDeleteTicket = useCallback(
-    async (organisationId: string, _boardId: string, ticket: Ticket) => {
+    async (organisationId: string, _boardId: string, ticket: TTicket) => {
       await deleteTicket({
         variables: { organisationId, ticketId: ticket.id },
       });
@@ -153,168 +167,36 @@ export default function App() {
 
   return (
     <>
-      <header
-        style={{
-          padding: 8,
-          color: "hsl(0 0% 100%)",
-          background: "hsl(0 0% 0%)",
-
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        {organisation.name}
-        <span>
-          {me.firstName} {me.lastName}
-        </span>
-      </header>
-
-      <div style={{ padding: 8 }}>
-        <h2>Boards</h2>
-        <button onClick={() => showBoardModal()}>Add board</button>
-
-        <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
-          {organisation.boards.map((b) => (
-            <article
-              key={b.id}
-              style={{
-                border: "solid 1px hsl(0 0% 50%)",
-                borderRadius: 8,
-
-                display: "flex",
-                gap: 4,
-                flexDirection: "column",
-              }}
-            >
-              <header
-                style={{
-                  padding: 4,
-                  borderBottom: "solid 1px hsl(0 0% 95%)",
-                  display: "flex",
-                  gap: 4,
-                }}
-              >
-                <h3>{b.name}</h3>
-
-                <button
-                  onClick={() => handleShowAddEditTicketClick(b as Board, null)}
-                >
-                  Add ticket
-                </button>
-
-                <button onClick={() => handleShowAddEditBoardClick(b as Board)}>
-                  Edit board
-                </button>
-
-                <button
-                  disabled
-                  onClick={() =>
-                    handleShowDeleteBoardClick(organisation.id, b as Board)
-                  }
-                >
-                  Delete board
-                </button>
-              </header>
-
-              <div style={{ padding: 4 }}>
-                {!b.tickets.length ? (
-                  <div>This board as no tickets, yet! </div>
-                ) : (
-                  <ul>
-                    {b.tickets.map((t) => (
-                      <li
-                        key={t.id}
-                        style={{
-                          display: "flex",
-                          gap: 4,
-                          alignItems: "center",
-                        }}
-                      >
-                        <span>
-                          {t.status === "DONE"
-                            ? "✅"
-                            : t.status === "INPROGRESS"
-                              ? "🔵"
-                              : "⚪"}
-                        </span>{" "}
-                        <span
-                          style={{
-                            color: t.visible ? "hsl(0 0% 0%)" : "hsl(0 0% 70%)",
-                            textDecoration:
-                              t.status === "DONE" ? "line-through" : "none",
-                          }}
-                        >
-                          {t.name}
-                        </span>{" "}
-                        <button
-                          onClick={() =>
-                            handleShowAddEditTicketClick(
-                              b as Board,
-                              t as Ticket,
-                            )
-                          }
-                        >
-                          Edit ticket
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleShowDeleteTicketClick(
-                              organisation.id,
-                              b.id,
-                              t as Ticket,
-                            )
-                          }
-                        >
-                          Delete ticket
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <details
+      <AppContainer>
+        <header
           style={{
-            marginTop: 8,
-            borderRadius: 8,
-            background: "hsl(0 0% 95%)",
+            padding: 16,
+            color: "hsl(0 0% 100%)",
+            background: "hsl(0 0% 10%)",
+
+            display: "flex",
+            justifyContent: "space-between",
           }}
         >
-          <summary style={{ padding: 8 }}>Raw Data</summary>
-          <div style={{ overflow: "scroll", padding: 8, maxHeight: 300 }}>
-            <pre>{JSON.stringify(dataMe, null, 2)}</pre>
-            <pre>{JSON.stringify(dataOrg, null, 2)}</pre>
+          {organisation.name}
+          <span>
+            {me.firstName} {me.lastName}
+          </span>
+        </header>
+        <main
+          style={{
+            overflow: "hidden",
+            display: "grid",
+            gridTemplateRows: "[board-header] auto [lists] 1fr",
+          }}
+        >
+          <div style={{ display: "flex" }}>
+            <h2>Boards</h2>
+            <button onClick={() => showBoardModal()}>Add board</button>
           </div>
-        </details>
-      </div>
-
-      {showDeleteBoard.show &&
-        showDeleteBoard.organisationId &&
-        showDeleteBoard.board &&
-        createPortal(
-          <>
-            <Overlay />
-            <dialog
-              open
-              style={{ position: "fixed", top: 50, maxWidth: "90%" }}
-            >
-              <ModalHeader
-                title="Delete Board"
-                onClose={() => setShowDeleteBoard({ show: false, board: null })}
-              />
-
-              <DeleteBoardForm
-                organisationId={showDeleteBoard.organisationId}
-                board={showDeleteBoard.board}
-                onClose={() => setShowDeleteBoard({ show: false, board: null })}
-              />
-            </dialog>
-          </>,
-          document.getElementById("modal")!,
-        )}
+          <BoardLists board={organisation.boards[0] as TBoard} />
+        </main>
+      </AppContainer>
 
       {showDeleteTicket.show &&
         showDeleteTicket.organisationId &&
