@@ -37,8 +37,8 @@ export const TextLoader = ({ width }: { width: number }) => {
   return (
     <TextLoaderContainer ref={el}>
       <ContentLoader
-        foregroundColor="hsl(0 0% 70%)"
-        backgroundColor="hsl(0 0% 60%)"
+        foregroundColor="hsl(0 0% 70% / 50%)"
+        backgroundColor="hsl(0 0% 60% / 50%)"
         title="Loading…"
         width={width}
         height={boxHeight}
