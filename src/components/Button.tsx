@@ -1,16 +1,42 @@
 import styled from "styled-components";
 
-const Button = styled.button<{
+export type ButtonType = "transparent" | "action" | "destructive";
+
+export interface ButtonProps {
   $active?: boolean;
-  $type?: "transparent" | "action" | "destructive";
-}>`
-  --base: ${({ $type = "transparent" }) =>
-    $type === "transparent" ? "transparent" : "hsl(0 0% 95%)"};
+  $type?: ButtonType;
+}
+
+function getBaseColor({ $type = "transparent" }: ButtonProps) {
+  switch ($type) {
+    case "transparent":
+      return "transparent";
+    case "action":
+      return "hsl(140 85% 35%)";
+    case "destructive":
+      return "hsl(0 85% 35%)";
+  }
+}
+
+function getForegroundColor({ $type = "transparent" }: ButtonProps) {
+  switch ($type) {
+    case "transparent":
+      return "color-mix(in hsl, var(--base), black 40%)";
+    case "action":
+      return "white";
+    case "destructive":
+      return "white";
+  }
+}
+
+const Button = styled.button<ButtonProps>`
+  --base: ${getBaseColor};
+  --foreground: ${getForegroundColor};
 
   padding: 6px;
 
   cursor: pointer;
-  color: color-mix(in hsl, var(--base), black 40%);
+  color: var(--foreground);
   font-size: 14px;
 
   border: 0;

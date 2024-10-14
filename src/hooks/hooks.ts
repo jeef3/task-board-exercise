@@ -1,5 +1,5 @@
-import { useQuery } from "@apollo/client";
-import { GET_ME, GET_ORGANISATION } from "../queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_ME, GET_ORGANISATION, PUT_BOARD } from "../queries";
 
 export function useCurrentUser() {
   return useQuery(GET_ME);
@@ -14,4 +14,8 @@ export function useCurrentOrg() {
     skip: !organisationId,
     variables: { organisationId: organisationId ?? "" },
   });
+}
+
+export function useUpdateBoard() {
+  return useMutation(PUT_BOARD);
 }

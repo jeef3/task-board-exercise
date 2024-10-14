@@ -6,11 +6,7 @@ import Modal from "../components/Modal";
 import ModalHeader from "../components/ModalHeader";
 import useForm from "../hooks/useForm";
 import { PUT_BOARD } from "../queries";
-
-interface BoardViewModel {
-  id?: Board["id"];
-  name: Board["name"];
-}
+import { BoardViewModel } from "../hooks/viewModels";
 
 const defaultNewBoard: BoardViewModel = {
   name: "",

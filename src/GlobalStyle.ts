@@ -11,7 +11,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
   }
 
-  button {
+  input, button {
     text-align: start;
     font-family: inherit;
     font-size: inherit;
