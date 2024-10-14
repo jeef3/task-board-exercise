@@ -24,13 +24,15 @@ import { ButtonBar, Spin } from "./atoms/Layout";
 import useCurrentBoard from "../hooks/useCurrentBoard";
 import { createPortal } from "react-dom";
 import Overlay from "./atoms/Overlay";
+import InlineInput from "./atoms/InlineInput";
 
 const Container = styled(Button)<{ $editing?: boolean }>`
   position: ${({ $editing }) => ($editing ? "relative" : "unset")};
   z-index: ${({ $editing }) => ($editing ? "1" : "0")};
   padding: 2px;
 
-  background: hsl(240 45% 80%) !important;
+  background: ${({ $editing }) =>
+    $editing ? "white !important" : "transparent"};
   border-radius: 8px;
 
   display: grid;
@@ -100,23 +102,13 @@ export default function BoardButton({ board }: { board: Board }) {
       >
         {isEditing ? (
           <>
-            <input
+            <InlineInput
               ref={el}
               required
               name="name"
               disabled={formState.isSubmitting}
               value={formData.name}
               onChange={handleChange}
-              style={{
-                display: "block",
-                minWidth: 1,
-                width: "auto",
-                border: 0,
-                background: "transparent",
-                borderRadius: 6,
-                padding: 4,
-                color: "black",
-              }}
             />
 
             <ButtonBar>
