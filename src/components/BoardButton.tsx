@@ -1,55 +1,67 @@
 import {
   FormEvent,
   MouseEventHandler,
-  ReactNode,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from "react";
-import { IconCheck, IconLoader2, IconPencil, IconX } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconLoader2,
+  IconPencil,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
 import styled from "styled-components";
 
+import { Board } from "../__generated__/graphql";
 import Button from "./Button";
-import { isString } from "../util/typeGuards";
 import { useCurrentOrg, useUpdateBoard } from "../hooks/hooks";
 import useForm from "../hooks/useForm";
 import { BoardViewModel } from "../hooks/viewModels";
 import { ButtonBar, Spin } from "./atoms/Layout";
+import useCurrentBoard from "../hooks/useCurrentBoard";
+import { createPortal } from "react-dom";
+import Overlay from "./atoms/Overlay";
 
-const Container = styled(Button)`
+const Container = styled(Button)<{ $editing?: boolean }>`
+  position: ${({ $editing }) => ($editing ? "relative" : "unset")};
+  z-index: ${({ $editing }) => ($editing ? "1" : "0")};
   padding: 2px;
 
+  background: hsl(240 45% 80%) !important;
   border-radius: 8px;
 
   display: grid;
   grid-template-columns: 1fr auto;
 `;
 
-export default function MenuButton({
-  label,
-  active = false,
-  onClick,
-}: {
-  label: ReactNode;
-  active?: boolean;
-  onClick?: MouseEventHandler;
-}) {
+export default function BoardButton({ board }: { board: Board }) {
+  const [currentBoard, setCurrentBoard] = useCurrentBoard();
   const { data: { organisation } = {} } = useCurrentOrg();
   const [updateBoard] = useUpdateBoard();
 
   const el = useRef<HTMLInputElement>(null);
-  const [editing, setEditing] = useState(false);
-  const [hover, setHover] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const isCurrentBoard = useMemo(
+    () => currentBoard && board.id === currentBoard.id,
+    [board.id, currentBoard],
+  );
 
   const { formData, formState, handleChange, handleSubmit, setError } =
-    useForm<BoardViewModel>({ name: label });
+    useForm<BoardViewModel>({ id: board.id, name: board.name });
 
   const handleEditClick: MouseEventHandler = useCallback(() => {
-    setEditing(true);
+    setIsEditing(true);
     setTimeout(() => {
       el.current?.select();
     });
   }, []);
+
+  const handleDeleteClick: MouseEventHandler = useCallback(() => {}, []);
 
   const onSubmit = useCallback(
     (e: FormEvent) =>
@@ -68,7 +80,7 @@ export default function MenuButton({
             },
           });
 
-          setEditing(false);
+          setIsEditing(false);
         } catch {
           setError("__root__", "Something went wrong, please try again");
         }
@@ -77,14 +89,16 @@ export default function MenuButton({
   );
 
   return (
-    <form onSubmit={onSubmit}>
+    <>
       <Container
-        as="div"
-        $active={active || editing}
-        onMouseOver={() => setHover(true)}
-        onMouseOut={() => setHover(false)}
+        as="form"
+        $active={isCurrentBoard || isEditing}
+        $editing={isEditing}
+        onSubmit={onSubmit}
+        onMouseOver={() => setIsHovering(true)}
+        onMouseOut={() => setIsHovering(false)}
       >
-        {editing && isString(label) ? (
+        {isEditing ? (
           <>
             <input
               ref={el}
@@ -124,29 +138,40 @@ export default function MenuButton({
                 $type="destructive"
                 title="Discard changes"
                 disabled={formState.isSubmitting}
-                onClick={() => setEditing(false)}
+                onClick={() => setIsEditing(false)}
               >
                 <IconX size="1em" />
               </Button>
             </ButtonBar>
+
+            <Button
+              $type="destructive"
+              onClick={handleDeleteClick}
+              style={{
+                position: "absolute",
+                top: "calc(100% + 8px)",
+              }}
+            >
+              <IconTrash size="1em" /> Delete board
+            </Button>
           </>
         ) : (
           <>
             <div
               style={{
                 padding: 4,
-                fontWeight: active ? 600 : 400,
-                color: active ? "black" : "inherit",
+                fontWeight: isCurrentBoard ? 600 : 400,
+                color: isCurrentBoard ? "black" : "inherit",
               }}
-              onClick={onClick}
+              onClick={() => setCurrentBoard(board)}
             >
-              {label}
+              {board.name}
             </div>
 
             <ButtonBar>
               <Button
                 title="Rename board"
-                style={{ opacity: hover ? 1 : 0 }}
+                style={{ opacity: isHovering ? 1 : 0 }}
                 onClick={handleEditClick}
               >
                 <IconPencil size="1em" />
@@ -155,6 +180,12 @@ export default function MenuButton({
           </>
         )}
       </Container>
-    </form>
+
+      {isEditing &&
+        createPortal(
+          <Overlay onClick={() => setIsEditing(false)} />,
+          document.getElementById("modal")!,
+        )}
+    </>
   );
 }

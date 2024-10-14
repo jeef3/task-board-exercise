@@ -13,8 +13,6 @@ export const SidePanelFooter = styled.div`
 `;
 
 export const SidePanel = styled.aside`
-  overflow: hidden;
-
   width: 200px;
 
   background: hsl(240 45% 80%);

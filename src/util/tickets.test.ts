@@ -5,7 +5,7 @@ import { filter_visibleOnly, reduce_bucketByStatus } from "./tickets";
 
 describe("Tickets", () => {
   describe("filter_visibleOnly", () => {
-    test("Can filter visible for tickets", () => {
+    test("Can filter visible tickets", () => {
       const tickets = [
         { name: "Visible ticket", visible: true },
         { name: "Invisible ticket", visible: false },
