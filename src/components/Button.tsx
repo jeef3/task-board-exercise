@@ -64,6 +64,15 @@ const Button = styled.button<ButtonProps>`
     color: color-mix(in hsl, var(--base), black 50%);
     background: color-mix(in hsl, var(--base), black 10%);
   }
+
+  &:disabled {
+    color: color-mix(in hsl, var(--base), white 50%);
+    background: color-mix(in hsl, var(--base), black 20%);
+  }
+
+  & svg {
+    display: block;
+  }
 `;
 
 export default Button;

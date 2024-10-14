@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
+import { IconCheck, IconLoader2, IconPencil, IconX } from "@tabler/icons-react";
 import styled from "styled-components";
 
 import Button from "./Button";
@@ -14,7 +14,7 @@ import { isString } from "../util/typeGuards";
 import { useCurrentOrg, useUpdateBoard } from "../hooks/hooks";
 import useForm from "../hooks/useForm";
 import { BoardViewModel } from "../hooks/viewModels";
-import { ButtonBar } from "./atoms/Layout";
+import { ButtonBar, Spin } from "./atoms/Layout";
 
 const Container = styled(Button)`
   padding: 2px;
@@ -41,10 +41,10 @@ export default function MenuButton({
   const [editing, setEditing] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const { formData, formState, handleChange, handleSubmit, setError } =
+  const { formState, handleChange, handleSubmit, setError } =
     useForm<BoardViewModel>();
 
-  const handleEditClick: MouseEventHandler = useCallback((e) => {
+  const handleEditClick: MouseEventHandler = useCallback(() => {
     setEditing(true);
     setTimeout(() => {
       el.current?.select();
@@ -67,6 +67,8 @@ export default function MenuButton({
               },
             },
           });
+
+          setEditing(false);
         } catch {
           setError("__root__", "Something went wrong, please try again");
         }
@@ -105,14 +107,22 @@ export default function MenuButton({
             <ButtonBar>
               <Button
                 $type="action"
+                type="submit"
                 title="Save changes"
-                onClick={() => setEditing(false)}
+                disabled={formState.isSubmitting}
               >
-                <IconCheck size="1em" />
+                {formState.isSubmitting ? (
+                  <Spin>
+                    <IconLoader2 size="1em" />
+                  </Spin>
+                ) : (
+                  <IconCheck size="1em" />
+                )}
               </Button>
               <Button
                 $type="destructive"
                 title="Discard changes"
+                disabled={formState.isSubmitting}
                 onClick={() => setEditing(false)}
               >
                 <IconX size="1em" />
