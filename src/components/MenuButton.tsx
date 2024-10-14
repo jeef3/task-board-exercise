@@ -3,11 +3,10 @@ import {
   MouseEventHandler,
   ReactNode,
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import { IconCheck, IconPencil } from "@tabler/icons-react";
+import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
 import styled from "styled-components";
 
 import Button from "./Button";
@@ -15,6 +14,7 @@ import { isString } from "../util/typeGuards";
 import { useCurrentOrg, useUpdateBoard } from "../hooks/hooks";
 import useForm from "../hooks/useForm";
 import { BoardViewModel } from "../hooks/viewModels";
+import { ButtonBar } from "./atoms/Layout";
 
 const Container = styled(Button)`
   padding: 2px;
@@ -92,6 +92,7 @@ export default function MenuButton({
               onChange={handleChange}
               style={{
                 display: "block",
+                minWidth: 1,
                 width: "auto",
                 border: 0,
                 background: "transparent",
@@ -101,7 +102,7 @@ export default function MenuButton({
               }}
             />
 
-            <div style={{ width: 50, display: "flex" }}>
+            <ButtonBar>
               <Button
                 $type="action"
                 title="Save changes"
@@ -110,13 +111,13 @@ export default function MenuButton({
                 <IconCheck size="1em" />
               </Button>
               <Button
-                $type="action"
-                title="Save changes"
+                $type="destructive"
+                title="Discard changes"
                 onClick={() => setEditing(false)}
               >
-                <IconCheck size="1em" />
+                <IconX size="1em" />
               </Button>
-            </div>
+            </ButtonBar>
           </>
         ) : (
           <>
@@ -131,13 +132,15 @@ export default function MenuButton({
               {label}
             </div>
 
-            <Button
-              title="Rename board"
-              style={{ opacity: hover ? 1 : 0 }}
-              onClick={handleEditClick}
-            >
-              <IconPencil size="1em" />
-            </Button>
+            <ButtonBar>
+              <Button
+                title="Rename board"
+                style={{ opacity: hover ? 1 : 0 }}
+                onClick={handleEditClick}
+              >
+                <IconPencil size="1em" />
+              </Button>
+            </ButtonBar>
           </>
         )}
       </Container>
