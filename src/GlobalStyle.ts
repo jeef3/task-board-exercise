@@ -16,6 +16,15 @@ const GlobalStyle = createGlobalStyle`
     font-family: inherit;
     font-size: inherit;
   }
+
+  hr {
+    margin: 4px;
+    width: 100%;
+    height: 0;
+
+    border: 0;
+    border-bottom: solid 1px hsl(0 0% 0% / 10%);
+  }
 `;
 
 export default GlobalStyle;

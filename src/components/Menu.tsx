@@ -44,6 +44,8 @@ export default function Menu() {
         ))
       )}
 
+      <hr />
+
       <Button onClick={() => showBoardModal()}>
         <IconSquarePlus2 size="1em" /> Add board
       </Button>
