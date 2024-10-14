@@ -13,7 +13,7 @@ export const BoardContainer = styled.div`
   }
 `;
 
-export const BoardColumn = styled.article`
+export const Column = styled.article`
   overflow: hidden;
   width: 300px;
   max-height: 100%;
@@ -49,19 +49,4 @@ export const ColumnFooter = styled.footer`
   padding: 8px;
 
   display: grid;
-`;
-
-export const TicketCount = styled.div`
-  width: 18px;
-  height: 18px;
-
-  color: hsl(0 0% 0% / 50%);
-  font-size: 12px;
-
-  border-radius: 18px;
-  background: hsl(0 0% 0% / 10%);
-
-  display: grid;
-  align-items: center;
-  justify-content: center;
 `;

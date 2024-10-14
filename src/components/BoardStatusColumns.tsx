@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { IconSquarePlus } from "@tabler/icons-react";
 
-import { type Board as TBoard, TicketStatus } from "../__generated__/graphql";
+import { TicketStatus } from "../__generated__/graphql";
 import {
   filter_visibleOnly,
   reduce_bucketByStatus,
@@ -9,17 +9,17 @@ import {
 } from "../util/tickets";
 import UnstyledList from "./atoms/UnstyledList";
 import {
-  BoardColumn,
+  Column,
   ColumnContent,
   ColumnFooter,
   ColumnHeader,
-  TicketCount,
   BoardContainer,
 } from "./atoms/BoardAtoms";
 import Button from "./Button";
 import Ticket from "./Ticket";
 import { BoxLoader, TextLoader } from "./ContentLoader";
 import useCurrentBoard from "../hooks/useCurrentBoard";
+import { EmptyLabel, TicketCount } from "./atoms/Text";
 
 const makeInitialBuckets = (): TicketBucket[] => [
   { name: "To Do", status: TicketStatus.Todo, tickets: [] },
@@ -44,7 +44,7 @@ export default function Board() {
         {buckets ? (
           buckets.map((bucket) => (
             <li key={bucket.status}>
-              <BoardColumn>
+              <Column>
                 <ColumnHeader>
                   <h3>{bucket.name}</h3>
                   <TicketCount>{bucket.tickets.length}</TicketCount>
@@ -52,15 +52,7 @@ export default function Board() {
 
                 <ColumnContent>
                   {!bucket.tickets.length ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        fontSize: 18,
-                        color: "hsl(240 10% 75% )",
-                      }}
-                    >
-                      No tickets!
-                    </div>
+                    <EmptyLabel>This list is empty</EmptyLabel>
                   ) : (
                     <UnstyledList as="ul" $direction="column">
                       {bucket.tickets.map((t) => (
@@ -77,7 +69,7 @@ export default function Board() {
                     <IconSquarePlus size="16" /> Add ticket
                   </Button>
                 </ColumnFooter>
-              </BoardColumn>
+              </Column>
             </li>
           ))
         ) : (
@@ -102,7 +94,7 @@ function ColumnLoading() {
   const ticketCount = useMemo(() => Math.ceil(Math.random() * 5), []);
 
   return (
-    <BoardColumn>
+    <Column>
       <ColumnHeader>
         <TextLoader width={120} />
       </ColumnHeader>
@@ -116,6 +108,6 @@ function ColumnLoading() {
         </UnstyledList>
       </ColumnContent>
       <ColumnFooter></ColumnFooter>
-    </BoardColumn>
+    </Column>
   );
 }

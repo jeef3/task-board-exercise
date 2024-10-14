@@ -129,22 +129,7 @@ export default function App() {
     if (!firstBoard) return;
 
     setCurrentBoard(firstBoard as TBoard);
-  }, [organisation]);
-
-  // if (loadingMe || loadingOrg) return <p>Loading…</p>;
-  // if (errorMe || errorOrg)
-  //   return (
-  //     <p>
-  //       Error:{" "}
-  //       {errorMe
-  //         ? errorMe.message
-  //         : errorOrg
-  //           ? errorOrg.message
-  //           : "Unknown error"}
-  //     </p>
-  //   );
-  // if (!me) return <p>No me data</p>;
-  // if (!organisation) return <p>No org data</p>;
+  }, [organisation, setCurrentBoard]);
 
   return (
     <>
