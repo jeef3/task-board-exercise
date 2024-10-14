@@ -41,8 +41,8 @@ export default function MenuButton({
   const [editing, setEditing] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const { formState, handleChange, handleSubmit, setError } =
-    useForm<BoardViewModel>();
+  const { formData, formState, handleChange, handleSubmit, setError } =
+    useForm<BoardViewModel>({ name: label });
 
   const handleEditClick: MouseEventHandler = useCallback(() => {
     setEditing(true);
@@ -90,7 +90,8 @@ export default function MenuButton({
               ref={el}
               required
               name="name"
-              value={label}
+              disabled={formState.isSubmitting}
+              value={formData.name}
               onChange={handleChange}
               style={{
                 display: "block",

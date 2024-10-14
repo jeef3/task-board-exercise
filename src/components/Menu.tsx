@@ -5,6 +5,12 @@ import useCurrentBoard from "../hooks/useCurrentBoard";
 import Button from "./Button";
 import { TextLoader } from "./ContentLoader";
 import MenuButton from "./MenuButton";
+import {
+  SidePanel,
+  SidePanelContent,
+  SidePanelFooter,
+  SidePanelTitle,
+} from "./atoms/MenuAtoms";
 
 export default function Menu() {
   const { data: { organisation } = {}, loading } = useCurrentOrg();
@@ -12,43 +18,35 @@ export default function Menu() {
   const [currentBoard, setCurrentBoard] = useCurrentBoard();
 
   return (
-    <div
-      style={{
-        overflow: "auto",
-        width: 200,
-        padding: 8,
-        display: "flex",
-        flexDirection: "column",
-        gap: 0,
-        alignItems: "stretch",
-        background: "hsl(240 45% 80%)",
-      }}
-    >
-      <h3>Boards</h3>
-      {loading || !organisation ? (
-        <>
-          <MenuButton label={<TextLoader width={90} />} />
-          <MenuButton label={<TextLoader width={80} />} />
-          <MenuButton label={<TextLoader width={110} />} />
-          <MenuButton label={<TextLoader width={90} />} />
-        </>
-      ) : !organisation.boards.length ? (
-        <div>No boards</div>
-      ) : (
-        organisation?.boards.map((b) => (
-          <MenuButton
-            label={b.name}
-            active={b === currentBoard}
-            onClick={() => setCurrentBoard(b as Board)}
-          />
-        ))
-      )}
+    <SidePanel>
+      <SidePanelTitle>Boards</SidePanelTitle>
 
-      <hr />
+      <SidePanelContent style={{ overflow: "auto" }}>
+        {loading || !organisation ? (
+          <>
+            <MenuButton label={<TextLoader width={90} />} />
+            <MenuButton label={<TextLoader width={80} />} />
+            <MenuButton label={<TextLoader width={110} />} />
+            <MenuButton label={<TextLoader width={90} />} />
+          </>
+        ) : !organisation.boards.length ? (
+          <div>No boards</div>
+        ) : (
+          organisation?.boards.map((b) => (
+            <MenuButton
+              label={b.name}
+              active={b === currentBoard}
+              onClick={() => setCurrentBoard(b as Board)}
+            />
+          ))
+        )}
+      </SidePanelContent>
 
-      <Button onClick={() => showBoardModal()}>
-        <IconSquarePlus2 size="1em" /> Add board
-      </Button>
-    </div>
+      <SidePanelFooter>
+        <Button onClick={() => showBoardModal()}>
+          <IconSquarePlus2 size="1em" /> Add board
+        </Button>
+      </SidePanelFooter>
+    </SidePanel>
   );
 }
