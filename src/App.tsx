@@ -9,7 +9,7 @@ import AppHeader from "./components/AppHeader";
 import Overlay from "./components/Overlay";
 import ModalHeader from "./components/ModalHeader";
 import DeleteTicketForm from "./components/DeleteTicketForm";
-import BoardStatusColumns from "./components/BoardStatusColumns";
+import Board from "./components/BoardStatusColumns";
 import BoardModal from "./modals/AddEditBoardModal";
 import TicketModal from "./modals/AddEditTicketModal";
 import DeleteBoardModal from "./modals/DeleteBoardModal";
@@ -19,8 +19,8 @@ import type {
   Ticket as TTicket,
 } from "./__generated__/graphql";
 import { useCurrentOrg } from "./hooks/hooks";
-import Button from "./components/Button";
-import { IconDotsVertical, IconSquarePlus2 } from "@tabler/icons-react";
+import Menu from "./components/Menu";
+import useCurrentBoard from "./hooks/useCurrentBoard";
 
 interface TicketModalState {
   show: boolean;
@@ -30,11 +30,11 @@ interface TicketModalState {
 }
 
 export default function App() {
+  const [currentBoard, setCurrentBoard] = useCurrentBoard();
   const { data: { organisation } = {}, refetch } = useCurrentOrg();
 
   const [deleteTicket] = useMutation(DELETE_TICKET);
 
-  const [activeBoard, setActiveBoard] = useState<TBoard | null>(null);
   const [activeTicket, setActiveTicket] = useState<TTicket | null>(null);
 
   const [showDeleteTicket, setShowDeleteTicket] = useState<
@@ -50,39 +50,39 @@ export default function App() {
     () => (
       <BoardModal
         organisationId={organisation?.id ?? ""}
-        board={activeBoard}
+        board={currentBoard}
         onClose={closeBoardModal}
       />
     ),
-    [activeBoard, organisation],
+    [currentBoard, organisation],
   );
 
   const [showDeleteBoardModal, closeDeleteBoardModal] = useModal(
     () => (
       <DeleteBoardModal
         organisationId={organisation?.id ?? ""}
-        board={activeBoard}
+        board={currentBoard}
         onClose={closeDeleteBoardModal}
       />
     ),
-    [activeBoard, organisation],
+    [currentBoard, organisation],
   );
 
   const [showTicketModal, closeTicketModal] = useModal(
     () => (
       <TicketModal
         organisationId={organisation?.id ?? ""}
-        boardId={activeBoard?.id ?? ""}
+        boardId={currentBoard?.id ?? ""}
         ticket={activeTicket}
         onClose={closeTicketModal}
       />
     ),
-    [activeBoard, organisation],
+    [currentBoard, organisation],
   );
 
   const handleShowAddEditBoardClick = useCallback(
     (board: TBoard) => {
-      setActiveBoard(board);
+      setCurrentBoard(board);
       showBoardModal();
     },
     [showBoardModal],
@@ -90,7 +90,7 @@ export default function App() {
 
   const handleShowDeleteBoardClick = useCallback(
     (board: TBoard) => {
-      setActiveBoard(board);
+      setCurrentBoard(board);
       showDeleteBoardModal();
     },
     [showDeleteBoardModal],
@@ -98,7 +98,7 @@ export default function App() {
 
   const handleShowAddEditTicketClick = useCallback(
     (board: TBoard, ticket: TTicket | null) => {
-      setActiveBoard(board);
+      setCurrentBoard(board);
       setActiveTicket(ticket);
       showTicketModal();
     },
@@ -128,7 +128,7 @@ export default function App() {
 
     if (!firstBoard) return;
 
-    setActiveBoard(firstBoard as TBoard);
+    setCurrentBoard(firstBoard as TBoard);
   }, [organisation]);
 
   // if (loadingMe || loadingOrg) return <p>Loading…</p>;
@@ -152,31 +152,8 @@ export default function App() {
         <AppHeader />
 
         <AppBody>
-          <div
-            style={{
-              padding: 8,
-              display: "flex",
-              gap: 4,
-              alignItems: "center",
-              background: "hsl(240 45% 80%)",
-            }}
-          >
-            {organisation?.boards.map((b) => (
-              <Button
-                onClick={() => setActiveBoard(b as TBoard)}
-                $active={b === activeBoard}
-              >
-                {b.name}
-              </Button>
-            ))}
-
-            <IconDotsVertical size="1em" color="hsl(0 0% 0% / 20%)" />
-
-            <Button onClick={() => showBoardModal()}>
-              <IconSquarePlus2 size="1em" /> Add board
-            </Button>
-          </div>
-          <BoardStatusColumns board={activeBoard} />
+          <Menu />
+          <Board />
         </AppBody>
       </AppContainer>
 

@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 import type { Ticket as TTicket } from "../__generated__/graphql";
 import { IconGripVertical } from "@tabler/icons-react";
+import { MouseEventHandler, useCallback, useEffect, useState } from "react";
 
 const Container = styled.div`
   padding: 8px 8px 8px 0;
@@ -14,11 +15,9 @@ const Container = styled.div`
   display: grid;
   column-gap: 4px;
   grid-template-columns: [grip] auto [name] 1fr;
-  grid-template-areas: "grip name" "grip description";
 `;
 
 const Grip = styled.div`
-  grid-area: grip;
   align-self: stretch;
 
   cursor: grab;
@@ -29,15 +28,12 @@ const Grip = styled.div`
 `;
 
 const Name = styled.h3`
-  grid-area: name;
   margin: 0;
 
   font-size: 14px;
 `;
 
 const Description = styled.p`
-  grid-area: description;
-
   margin: 0;
 
   color: hsl(0 0% 80%);
@@ -45,13 +41,41 @@ const Description = styled.p`
 `;
 
 export default function Ticket({ ticket }: { ticket: TTicket }) {
+  const [editing, setEditing] = useState(false);
+
+  const stopEditing = () => {
+    console.log("stop editing");
+    setEditing(false);
+    document.removeEventListener("click", stopEditing);
+  };
+
+  const handleClick = useCallback(() => {
+    console.log("editing");
+    setEditing(true);
+
+    document.addEventListener("click", stopEditing);
+  }, []);
+
   return (
     <Container>
       <Grip>
         <IconGripVertical size="1em" />
       </Grip>
-      <Name>{ticket.name}</Name>
-      <Description>{ticket.description || <em>No description</em>}</Description>
+      {editing ? (
+        <div onClick={stopEditing}>
+          <Name>{ticket.name} editing</Name>
+          <Description>
+            {ticket.description || <em>No description</em>}
+          </Description>
+        </div>
+      ) : (
+        <div style={{ cursor: "pointer" }} onClick={handleClick}>
+          <Name>{ticket.name}</Name>
+          <Description>
+            {ticket.description || <em>No description</em>}
+          </Description>
+        </div>
+      )}
     </Container>
   );
 }

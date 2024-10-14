@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import CL from "react-content-loader";
 import styled from "styled-components";
 
@@ -13,7 +13,7 @@ const ContentLoader = ({
   width,
   height,
 }: {
-  children?: ReactElement;
+  children?: ReactNode;
   width?: string | number;
   height?: string | number;
 }) => (

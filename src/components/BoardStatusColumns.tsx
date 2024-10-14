@@ -19,6 +19,7 @@ import {
 import Button from "./Button";
 import Ticket from "./Ticket";
 import { BoxLoader, TextLoader } from "./ContentLoader";
+import useCurrentBoard from "../hooks/useCurrentBoard";
 
 const makeInitialBuckets = (): TicketBucket[] => [
   { name: "To Do", status: TicketStatus.Todo, tickets: [] },
@@ -26,11 +27,9 @@ const makeInitialBuckets = (): TicketBucket[] => [
   { name: "Done", status: TicketStatus.Done, tickets: [] },
 ];
 
-export default function BoardStatusColumns({
-  board,
-}: {
-  board: TBoard | null;
-}) {
+export default function Board() {
+  const [board] = useCurrentBoard();
+
   const buckets = useMemo(
     () =>
       board?.tickets
@@ -109,8 +108,8 @@ function ColumnLoading() {
       </ColumnHeader>
       <ColumnContent>
         <UnstyledList as="ul" $direction="column">
-          {Array.from(Array(ticketCount)).map(() => (
-            <li>
+          {Array.from(Array(ticketCount)).map((_, i) => (
+            <li key={`loading-${i}`}>
               <BoxLoader height={50} radius={6} />
             </li>
           ))}

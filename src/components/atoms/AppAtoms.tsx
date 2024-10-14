@@ -25,5 +25,5 @@ export const AppBody = styled.main`
   overflow: hidden;
 
   display: grid;
-  grid-template-rows: [board-header] auto [columns] 1fr;
+  grid-template-columns: [board-header] auto [columns] 1fr;
 `;

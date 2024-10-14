@@ -11,6 +11,7 @@ const Button = styled.button<{
 
   cursor: pointer;
   color: color-mix(in hsl, var(--base), black 40%);
+  font-size: 14px;
 
   border: 0;
   border-radius: 6px;
@@ -20,7 +21,6 @@ const Button = styled.button<{
     $active &&
     `
   background: color-mix(in hsl, var(--base), black 5%);
-  box-shadow: inset 0 1px 2px hsl(0 0% 0% / 20%);
   `}
 
   display: flex;

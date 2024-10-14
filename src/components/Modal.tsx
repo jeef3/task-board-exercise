@@ -1,11 +1,7 @@
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import Overlay from "./Overlay";
 
-export default function Modal({
-  children,
-}: {
-  children: ReactElement | ReactElement[];
-}) {
+export default function Modal({ children }: { children: ReactNode }) {
   return (
     <>
       <Overlay />
