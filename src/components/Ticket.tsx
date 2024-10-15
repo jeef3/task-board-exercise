@@ -22,18 +22,25 @@ import {
 } from "./atoms/TicketAtoms";
 import Button from "./Button";
 import Overlay from "./atoms/Overlay";
-import { useCurrentOrg, useUpdateTicket } from "../hooks/hooks";
+import {
+  useCurrentOrg,
+  useDeleteTicket,
+  useUpdateTicket,
+} from "../hooks/hooks";
 import useCurrentBoard from "../hooks/useCurrentBoard";
 import usePosition from "../hooks/usePosition";
 
 export default function Ticket({ ticket }: { ticket: TTicket }) {
-  const { data: { organisation } = {} } = useCurrentOrg();
+  const { data: { organisation } = {}, refetch } = useCurrentOrg();
   const [currentBoard] = useCurrentBoard();
+
   const [updateTicket] = useUpdateTicket();
+  const [deleteTicket] = useDeleteTicket();
 
   const nameEl = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { targetRef, positionProps } = usePosition<HTMLDivElement>();
 
@@ -51,7 +58,15 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
     setTimeout(() => nameEl.current?.select());
   }, []);
 
-  const handleDeleteClick = useCallback(() => {}, []);
+  const handleDeleteClick = useCallback(async () => {
+    if (!organisation) return;
+    setIsDeleting(true);
+
+    await deleteTicket({
+      variables: { organisationId: organisation.id, ticketId: ticket.id },
+    });
+    await refetch();
+  }, [deleteTicket, organisation, refetch, ticket.id]);
 
   const onSubmit = useCallback(
     (e: FormEvent) =>
@@ -129,7 +144,7 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
                     ref={nameEl}
                     required
                     name="name"
-                    disabled={formState.isSubmitting}
+                    disabled={formState.isSubmitting || isDeleting}
                     value={formData.name}
                     onChange={handleChange}
                   />
@@ -137,7 +152,7 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
                 <Description>
                   <InlineTextArea
                     name="description"
-                    disabled={formState.isSubmitting}
+                    disabled={formState.isSubmitting || isDeleting}
                     value={formData.description}
                     onChange={handleChange}
                   />
@@ -154,15 +169,27 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
               >
                 <Button
                   $type="destructive"
+                  type="button"
+                  disabled={formState.isSubmitting || isDeleting}
                   onClick={handleDeleteClick}
-                  disabled={formState.isSubmitting}
                 >
-                  <IconTrash size="1em" /> Delete ticket
+                  {isDeleting ? (
+                    <>
+                      <Spin>
+                        <IconLoader2 size="1em" />
+                      </Spin>{" "}
+                      Deleting ticket…
+                    </>
+                  ) : (
+                    <>
+                      <IconTrash size="1em" /> Delete ticket
+                    </>
+                  )}
                 </Button>
                 <Button
                   $type="action"
                   type="submit"
-                  disabled={formState.isSubmitting}
+                  disabled={formState.isSubmitting || isDeleting}
                 >
                   {formState.isSubmitting ? (
                     <>

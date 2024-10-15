@@ -1,5 +1,11 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_ME, GET_ORGANISATION, PUT_BOARD, PUT_TICKET } from "../queries";
+import {
+  DELETE_TICKET,
+  GET_ME,
+  GET_ORGANISATION,
+  PUT_BOARD,
+  PUT_TICKET,
+} from "../queries";
 
 export function useCurrentUser() {
   return useQuery(GET_ME);
@@ -22,4 +28,8 @@ export function useUpdateBoard() {
 
 export function useUpdateTicket() {
   return useMutation(PUT_TICKET);
+}
+
+export function useDeleteTicket() {
+  return useMutation(DELETE_TICKET);
 }
