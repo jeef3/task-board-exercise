@@ -1,8 +1,7 @@
 import styled from "styled-components";
 
-export const TicketContainer = styled.div<{ $editing?: boolean }>`
+export const TicketContainer = styled.div`
   position: relative;
-  z-index: ${({ $editing = false }) => ($editing ? "1" : "0")};
   padding: 8px 8px 8px 0;
 
   cursor: default;

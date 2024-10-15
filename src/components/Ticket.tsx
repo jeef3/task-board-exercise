@@ -1,11 +1,17 @@
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { IconGripVertical, IconPencil, IconTrash } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconGripVertical,
+  IconLoader2,
+  IconPencil,
+  IconTrash,
+} from "@tabler/icons-react";
 
 import type { Ticket as TTicket } from "../__generated__/graphql";
 import useForm from "../hooks/useForm";
 import { TicketViewModel } from "../hooks/viewModels";
-import { ButtonBar } from "./atoms/Layout";
+import { ButtonBar, Spin } from "./atoms/Layout";
 import { InlineInput, InlineTextArea } from "./atoms/Form";
 import {
   TicketContainer,
@@ -18,6 +24,7 @@ import Button from "./Button";
 import Overlay from "./atoms/Overlay";
 import { useCurrentOrg, useUpdateTicket } from "../hooks/hooks";
 import useCurrentBoard from "../hooks/useCurrentBoard";
+import usePosition from "../hooks/usePosition";
 
 export default function Ticket({ ticket }: { ticket: TTicket }) {
   const { data: { organisation } = {} } = useCurrentOrg();
@@ -27,6 +34,8 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
   const nameEl = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+
+  const { targetRef, positionProps } = usePosition<HTMLDivElement>();
 
   const { formData, formState, handleChange, handleSubmit, setError } =
     useForm<TicketViewModel>({
@@ -64,6 +73,8 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
               },
             },
           });
+
+          setIsEditing(false);
         } catch {
           setError("__root__", "Something went wrong, please try again");
         }
@@ -74,74 +85,99 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
   return (
     <>
       <TicketContainer
-        $editing={isEditing}
+        ref={targetRef}
         onMouseOver={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
       >
         <Grip>
           <IconGripVertical size="1em" />
         </Grip>
-        {isEditing ? (
-          <>
-            <TicketContent as="form" $editing={isEditing} onSubmit={onSubmit}>
-              <Name>
-                <InlineInput
-                  ref={nameEl}
-                  required
-                  name="name"
-                  disabled={formState.isSubmitting}
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-              </Name>
-              <Description>
-                <InlineTextArea
-                  name="description"
-                  disabled={formState.isSubmitting}
-                  value={formData.description}
-                  onChange={handleChange}
-                />
-              </Description>
-            </TicketContent>
+        <TicketContent>
+          <Name>{ticket.name}</Name>
+          <Description>
+            {ticket.description || <em>No description</em>}
+          </Description>
+        </TicketContent>
 
-            <Button
-              $type="destructive"
-              onClick={handleDeleteClick}
-              style={{
-                position: "absolute",
-                top: "calc(100% + 8px)",
-              }}
-            >
-              <IconTrash size="1em" /> Delete ticket
-            </Button>
-          </>
-        ) : (
-          <>
-            <TicketContent>
-              <Name>{ticket.name}</Name>
-              <Description>
-                {ticket.description || <em>No description</em>}
-              </Description>
-            </TicketContent>
-
-            <ButtonBar
-              style={{ position: "absolute", zIndex: 1, top: 2, right: 2 }}
-            >
-              <Button
-                title="Rename board"
-                style={{ opacity: isHovering ? 1 : 0 }}
-                onClick={handleEditClick}
-              >
-                <IconPencil size="1em" />
-              </Button>
-            </ButtonBar>
-          </>
-        )}
+        <ButtonBar
+          style={{ position: "absolute", zIndex: 1, top: 2, right: 2 }}
+        >
+          <Button
+            title="Rename board"
+            style={{ opacity: isHovering ? 1 : 0 }}
+            onClick={handleEditClick}
+          >
+            <IconPencil size="1em" />
+          </Button>
+        </ButtonBar>
       </TicketContainer>
 
       {isEditing &&
         createPortal(
-          <Overlay onClick={() => setIsEditing(false)} />,
+          <>
+            <Overlay onClick={() => setIsEditing(false)} />
+            <TicketContainer as="form" onSubmit={onSubmit} {...positionProps()}>
+              <Grip>
+                <IconGripVertical size="1em" />
+              </Grip>
+
+              <TicketContent $editing={isEditing}>
+                <Name>
+                  <InlineInput
+                    ref={nameEl}
+                    required
+                    name="name"
+                    disabled={formState.isSubmitting}
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </Name>
+                <Description>
+                  <InlineTextArea
+                    name="description"
+                    disabled={formState.isSubmitting}
+                    value={formData.description}
+                    onChange={handleChange}
+                  />
+                </Description>
+              </TicketContent>
+
+              <ButtonBar
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Button
+                  $type="destructive"
+                  onClick={handleDeleteClick}
+                  disabled={formState.isSubmitting}
+                >
+                  <IconTrash size="1em" /> Delete ticket
+                </Button>
+                <Button
+                  $type="action"
+                  type="submit"
+                  disabled={formState.isSubmitting}
+                >
+                  {formState.isSubmitting ? (
+                    <>
+                      <Spin>
+                        <IconLoader2 size="1em" />
+                      </Spin>{" "}
+                      Saving changes…
+                    </>
+                  ) : (
+                    <>
+                      <IconCheck size="1em" /> Save changes
+                    </>
+                  )}
+                </Button>
+              </ButtonBar>
+            </TicketContainer>
+          </>,
           document.getElementById("modal")!,
         )}
     </>
