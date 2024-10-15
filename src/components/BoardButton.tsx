@@ -158,7 +158,9 @@ export default function BoardButton({ board }: { board: Board }) {
 
       {isEditing &&
         createPortal(
-          <Overlay onClick={() => setIsEditing(false)} />,
+          <Overlay
+            onClick={() => !formState.isSubmitting && setIsEditing(false)}
+          />,
           document.getElementById("modal")!,
         )}
     </>

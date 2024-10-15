@@ -115,7 +115,9 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
       {isEditing &&
         createPortal(
           <>
-            <Overlay onClick={() => setIsEditing(false)} />
+            <Overlay
+              onClick={() => !formState.isSubmitting && setIsEditing(false)}
+            />
             <TicketContainer as="form" onSubmit={onSubmit} {...positionProps()}>
               <Grip>
                 <IconGripVertical size="1em" />
