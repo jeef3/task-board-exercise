@@ -36,7 +36,9 @@ export default function Menu() {
         ) : !organisation.boards.length ? (
           <div>No boards</div>
         ) : (
-          organisation?.boards.map((b) => <BoardButton board={b as Board} />)
+          organisation?.boards.map((b) => (
+            <BoardButton key={b.id} board={b as Board} />
+          ))
         )}
       </SidePanelContent>
 

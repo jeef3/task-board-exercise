@@ -7,8 +7,8 @@ export interface BoardViewModel {
 
 export interface TicketViewModel {
   id?: Ticket["id"];
-  name: Ticket["name"];
-  description: Ticket["description"];
-  status: Ticket["status"];
-  visible: Ticket["visible"];
+  name?: Ticket["name"];
+  description?: Ticket["description"];
+  status?: Ticket["status"];
+  visible?: Ticket["visible"];
 }

@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { IconSquarePlus } from "@tabler/icons-react";
 
-import { TicketStatus } from "../__generated__/graphql";
+import { TicketStatus, Ticket as TTicket } from "../__generated__/graphql";
 import {
   filter_visibleOnly,
   reduce_bucketByStatus,
@@ -20,6 +20,7 @@ import Ticket from "./Ticket";
 import { BoxLoader, TextLoader } from "./ContentLoader";
 import useCurrentBoard from "../hooks/useCurrentBoard";
 import { EmptyLabel, TicketCount } from "./atoms/Text";
+import NewTicket from "./NewTicket";
 
 const makeInitialBuckets = (): TicketBucket[] => [
   { name: "To Do", status: TicketStatus.Todo, tickets: [] },
@@ -30,6 +31,11 @@ const makeInitialBuckets = (): TicketBucket[] => [
 export default function Board() {
   const [board] = useCurrentBoard();
 
+  const [addingTicket, setAddingTicket] = useState<{
+    status: TicketStatus;
+    template: Partial<TTicket>;
+  } | null>(null);
+
   const buckets = useMemo(
     () =>
       board?.tickets
@@ -37,6 +43,10 @@ export default function Board() {
         .reduce(reduce_bucketByStatus, makeInitialBuckets()),
     [board?.tickets],
   );
+
+  const handleAddTicketClick = useCallback((status: TicketStatus) => {
+    setAddingTicket({ status, template: { status, visible: true } });
+  }, []);
 
   return (
     <BoardContainer>
@@ -51,7 +61,7 @@ export default function Board() {
                 </ColumnHeader>
 
                 <ColumnContent>
-                  {!bucket.tickets.length ? (
+                  {!addingTicket && !bucket.tickets.length ? (
                     <EmptyLabel>This list is empty</EmptyLabel>
                   ) : (
                     <UnstyledList as="ul" $direction="column">
@@ -60,12 +70,24 @@ export default function Board() {
                           <Ticket ticket={t} />
                         </li>
                       ))}
+                      {addingTicket &&
+                        addingTicket.status === bucket.status && (
+                          <li>
+                            <NewTicket
+                              template={addingTicket.template}
+                              onClose={() => setAddingTicket(null)}
+                            />
+                          </li>
+                        )}
                     </UnstyledList>
                   )}
                 </ColumnContent>
 
                 <ColumnFooter>
-                  <Button $type="transparent">
+                  <Button
+                    $type="transparent"
+                    onClick={() => handleAddTicketClick(bucket.status)}
+                  >
                     <IconSquarePlus size="16" /> Add ticket
                   </Button>
                 </ColumnFooter>

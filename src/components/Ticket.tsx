@@ -133,7 +133,7 @@ export default function Ticket({ ticket }: { ticket: TTicket }) {
             <Overlay
               onClick={() => !formState.isSubmitting && setIsEditing(false)}
             />
-            <TicketContainer as="form" onSubmit={onSubmit} {...positionProps()}>
+            <TicketContainer as="form" onSubmit={onSubmit} {...positionProps}>
               <Grip>
                 <IconGripVertical size="1em" />
               </Grip>
