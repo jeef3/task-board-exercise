@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Overlay from "./Overlay";
+import Overlay from "./atoms/Overlay";
 
 export default function Modal({ children }: { children: ReactNode }) {
   return (

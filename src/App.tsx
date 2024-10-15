@@ -6,7 +6,7 @@ import { useModal } from "react-modal-hook";
 import { DELETE_TICKET } from "./queries";
 import { AppBody, AppContainer } from "./components/atoms/AppAtoms";
 import AppHeader from "./components/AppHeader";
-import Overlay from "./components/Overlay";
+import Overlay from "./components/atoms/Overlay";
 import ModalHeader from "./components/ModalHeader";
 import DeleteTicketForm from "./components/DeleteTicketForm";
 import Board from "./components/BoardStatusColumns";

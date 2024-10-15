@@ -6,14 +6,7 @@ import { PUT_TICKET } from "../queries";
 import useForm from "../hooks/useForm";
 import Modal from "../components/Modal";
 import ModalHeader from "../components/ModalHeader";
-
-interface TicketViewModel {
-  id?: Ticket["id"];
-  name: Ticket["name"];
-  description: Ticket["description"];
-  status: Ticket["status"];
-  visible: Ticket["visible"];
-}
+import { TicketViewModel } from "../hooks/viewModels";
 
 const defaultNewTicket: TicketViewModel = {
   name: "",

@@ -13,7 +13,6 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import styled from "styled-components";
 
 import { Board } from "../__generated__/graphql";
 import Button from "./Button";
@@ -24,24 +23,12 @@ import { ButtonBar, Spin } from "./atoms/Layout";
 import useCurrentBoard from "../hooks/useCurrentBoard";
 import { createPortal } from "react-dom";
 import Overlay from "./atoms/Overlay";
-import InlineInput from "./atoms/InlineInput";
-
-const Container = styled(Button)<{ $editing?: boolean }>`
-  position: ${({ $editing }) => ($editing ? "relative" : "unset")};
-  z-index: ${({ $editing }) => ($editing ? "1" : "0")};
-  padding: 2px;
-
-  background: ${({ $editing }) =>
-    $editing ? "white !important" : "transparent"};
-  border-radius: 8px;
-
-  display: grid;
-  grid-template-columns: 1fr auto;
-`;
+import { InlineInput } from "./atoms/Form";
+import { BoardButtonContainer, BoardName } from "./atoms/MenuAtoms";
 
 export default function BoardButton({ board }: { board: Board }) {
-  const [currentBoard, setCurrentBoard] = useCurrentBoard();
   const { data: { organisation } = {} } = useCurrentOrg();
+  const [currentBoard, setCurrentBoard] = useCurrentBoard();
   const [updateBoard] = useUpdateBoard();
 
   const el = useRef<HTMLInputElement>(null);
@@ -49,7 +36,7 @@ export default function BoardButton({ board }: { board: Board }) {
   const [isHovering, setIsHovering] = useState(false);
 
   const isCurrentBoard = useMemo(
-    () => currentBoard && board.id === currentBoard.id,
+    () => (currentBoard && board.id === currentBoard.id) ?? false,
     [board.id, currentBoard],
   );
 
@@ -58,9 +45,7 @@ export default function BoardButton({ board }: { board: Board }) {
 
   const handleEditClick: MouseEventHandler = useCallback(() => {
     setIsEditing(true);
-    setTimeout(() => {
-      el.current?.select();
-    });
+    setTimeout(() => el.current?.select());
   }, []);
 
   const handleDeleteClick: MouseEventHandler = useCallback(() => {}, []);
@@ -92,7 +77,7 @@ export default function BoardButton({ board }: { board: Board }) {
 
   return (
     <>
-      <Container
+      <BoardButtonContainer
         as="form"
         $active={isCurrentBoard || isEditing}
         $editing={isEditing}
@@ -102,14 +87,16 @@ export default function BoardButton({ board }: { board: Board }) {
       >
         {isEditing ? (
           <>
-            <InlineInput
-              ref={el}
-              required
-              name="name"
-              disabled={formState.isSubmitting}
-              value={formData.name}
-              onChange={handleChange}
-            />
+            <BoardName>
+              <InlineInput
+                ref={el}
+                required
+                name="name"
+                disabled={formState.isSubmitting}
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </BoardName>
 
             <ButtonBar>
               <Button
@@ -149,16 +136,12 @@ export default function BoardButton({ board }: { board: Board }) {
           </>
         ) : (
           <>
-            <div
-              style={{
-                padding: 4,
-                fontWeight: isCurrentBoard ? 600 : 400,
-                color: isCurrentBoard ? "black" : "inherit",
-              }}
+            <BoardName
+              $active={isCurrentBoard}
               onClick={() => setCurrentBoard(board)}
             >
               {board.name}
-            </div>
+            </BoardName>
 
             <ButtonBar>
               <Button
@@ -171,7 +154,7 @@ export default function BoardButton({ board }: { board: Board }) {
             </ButtonBar>
           </>
         )}
-      </Container>
+      </BoardButtonContainer>
 
       {isEditing &&
         createPortal(
